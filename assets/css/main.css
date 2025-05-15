@@ -1,0 +1,244 @@
+/**
+ * 한국어 웹사이트 분석기 메인 스타일시트
+ * 
+ * 이 파일은 KoreanWebAnalyzer의 기본 스타일을 정의합니다.
+ * 모듈별 스타일시트는 각각 별도로 로드됩니다:
+ * - charts.css: 차트와 데이터 시각화 관련 스타일
+ * - overlay.css: 오버레이 UI 관련 스타일
+ * - web-vitals.css: Core Web Vitals 분석 결과 표시 스타일
+ */
+
+/* 오버레이 기본 스타일 */
+.kwa-overlay {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 80%;
+  max-width: 400px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 9999999;
+  font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Nanum Gothic', sans-serif;
+  color: #333;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.kwa-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  background-color: #4285f4;
+  color: white;
+}
+
+.kwa-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.kwa-close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.kwa-content {
+  padding: 15px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* 탭 인터페이스 스타일 */
+.kwa-tabs {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 15px;
+}
+
+.kwa-tab {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-size: 14px;
+}
+
+.kwa-tab:hover {
+  background-color: #f8f9fa;
+}
+
+.kwa-tab.active {
+  border-bottom-color: #4285f4;
+  font-weight: bold;
+}
+
+.kwa-tab-content {
+  display: none;
+}
+
+.kwa-tab-content.active {
+  display: block;
+}
+
+/* 점수 카드 스타일 */
+.kwa-score-card {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.kwa-score {
+  font-size: 36px;
+  font-weight: bold;
+  color: #4285f4;
+}
+
+.kwa-score-label {
+  font-size: 12px;
+  color: #777;
+  margin-top: 5px;
+}
+
+/* 문제점 목록 스타일 */
+.kwa-issues {
+  margin-top: 20px;
+}
+
+.kwa-issue-item {
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  border-left: 4px solid #e0e0e0;
+}
+
+.kwa-issue-critical {
+  background-color: #fef2f2;
+  border-left-color: #dc2626;
+}
+
+.kwa-issue-major {
+  background-color: #fff7ed;
+  border-left-color: #ea580c;
+}
+
+.kwa-issue-minor {
+  background-color: #f0fdfa;
+  border-left-color: #0d9488;
+}
+
+.kwa-issue-title {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.kwa-issue-description {
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.kwa-issue-solution {
+  font-size: 12px;
+  padding: 6px 8px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 4px;
+}
+
+/* 로딩 표시 스타일 */
+.kwa-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.kwa-spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #4285f4;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: kwa-spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes kwa-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 버튼 스타일 */
+.kwa-button {
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.kwa-button:hover {
+  background-color: #3367d6;
+}
+
+.kwa-button.secondary {
+  background-color: #f8f9fa;
+  color: #333;
+  border: 1px solid #e0e0e0;
+}
+
+.kwa-button.secondary:hover {
+  background-color: #e9ecef;
+}
+
+/* 오류 메시지 스타일 */
+.kwa-error {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+  .kwa-overlay {
+    width: 90%;
+    top: 10px;
+    right: 10px;
+  }
+  
+  .kwa-score {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .kwa-overlay {
+    width: 95%;
+    top: 5px;
+    right: 5px;
+  }
+  
+  .kwa-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .kwa-tab {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+}

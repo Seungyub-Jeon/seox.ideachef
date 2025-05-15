@@ -1,0 +1,91 @@
+{
+  "meta": {
+    "generatedAt": "2025-05-15T03:05:36.487Z",
+    "tasksAnalyzed": 10,
+    "thresholdScore": 5,
+    "projectName": "Taskmaster",
+    "usedResearch": true
+  },
+  "complexityAnalysis": [
+    {
+      "taskId": 1,
+      "taskTitle": "북마클릿 코어 구조 개발",
+      "complexityScore": 7,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Break down the bookmarklet core structure development into implementation steps for loader script, main script functionality, file structure setup, and size limitation solutions",
+      "reasoning": "This task involves JavaScript development with multiple components including loader script, main script with several functionalities, and file structure setup. The complexity comes from ensuring cross-browser compatibility and handling both static and dynamic pages."
+    },
+    {
+      "taskId": 2,
+      "taskTitle": "기본 오버레이 UI 구현",
+      "complexityScore": 6,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Divide the overlay UI implementation into container structure, tab interface, stylesheet development, and responsive design components",
+      "reasoning": "Creating an overlay UI requires DOM manipulation, event handling, and CSS styling. The task includes implementing a tab interface and ensuring responsive design across devices, adding moderate complexity."
+    },
+    {
+      "taskId": 3,
+      "taskTitle": "SEO 분석 모듈 개발",
+      "complexityScore": 8,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the SEO analysis module into components for meta tag analysis, heading structure analysis, content analysis, link analysis, and scoring algorithm implementation",
+      "reasoning": "This module requires complex analysis logic for multiple SEO elements, keyword density calculation, and a sophisticated scoring algorithm. The comprehensive nature of SEO analysis with multiple evaluation criteria increases complexity."
+    },
+    {
+      "taskId": 4,
+      "taskTitle": "웹표준 검증 모듈 개발",
+      "complexityScore": 7,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Divide the web standards validation module into components for HTML validity checking, semantic markup analysis, deprecated elements detection, and document structure validation",
+      "reasoning": "Web standards validation requires detailed HTML structure analysis and understanding of HTML5 specifications. The task involves multiple validation rules and complex parsing logic to identify structural issues."
+    },
+    {
+      "taskId": 5,
+      "taskTitle": "웹접근성 점검 모듈 개발",
+      "complexityScore": 8,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the accessibility checking module into components for alt text validation, keyboard accessibility testing, ARIA attributes verification, heading structure analysis, and form accessibility evaluation",
+      "reasoning": "Accessibility checking involves multiple WCAG guidelines and requires deep DOM traversal to evaluate various accessibility aspects. The complexity comes from the breadth of accessibility requirements and the need for nuanced analysis."
+    },
+    {
+      "taskId": 6,
+      "taskTitle": "결과 시각화 및 차트 구현",
+      "complexityScore": 7,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Divide the visualization implementation into score card components, chart types (radar, bar, pie), issue visualization system, and responsive chart adaptation",
+      "reasoning": "Creating data visualizations requires both UI development and data processing skills. The task involves implementing multiple chart types, ensuring they're responsive, and handling various data scenarios for accurate representation."
+    },
+    {
+      "taskId": 7,
+      "taskTitle": "성능 및 모바일 친화성 분석 모듈 개발",
+      "complexityScore": 8,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the performance and mobile-friendliness module into resource analysis, request analysis, load time measurement, media optimization checking, and mobile-specific feature validation",
+      "reasoning": "This module requires integration with browser Performance API and complex analysis of multiple performance metrics. The dual focus on both performance and mobile-friendliness increases the scope and complexity."
+    },
+    {
+      "taskId": 8,
+      "taskTitle": "보안 분석 모듈 개발",
+      "complexityScore": 7,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Divide the security analysis module into HTTPS verification, content security policy checking, form security validation, and external link security assessment",
+      "reasoning": "Security analysis requires specialized knowledge and careful implementation to avoid false positives. The task involves checking multiple security aspects with client-side limitations that need to be clearly communicated."
+    },
+    {
+      "taskId": 9,
+      "taskTitle": "종합 보고서 생성 모듈 개발",
+      "complexityScore": 6,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Break down the comprehensive report generation module into score calculation algorithms, issue summarization logic, recommendation prioritization, and report structure implementation",
+      "reasoning": "This module integrates results from multiple analysis modules and requires algorithms for score calculation and recommendation prioritization. The complexity comes from synthesizing diverse data into a coherent report."
+    },
+    {
+      "taskId": 10,
+      "taskTitle": "서버 측 기능 및 보고서 저장 구현",
+      "complexityScore": 6,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Divide the server-side functionality into API endpoint implementation, report storage system, client-server communication, and report sharing features",
+      "reasoning": "This task involves PHP backend development with API endpoints, file storage, and client-server communication. While the individual components are straightforward, ensuring secure and reliable operation adds complexity."
+    }
+  ]
+}

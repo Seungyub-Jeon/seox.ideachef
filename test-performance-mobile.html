@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>성능 및 모바일 분석 테스트</title>
+    <style>
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .container {
+            margin-bottom: 2rem;
+            border: 1px solid #eee;
+            padding: 1rem;
+            border-radius: 5px;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        .result-container {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .score-category {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        .score-bar {
+            flex-grow: 1;
+            height: 20px;
+            background-color: #eee;
+            margin: 0 10px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .score-value {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        .issues-container {
+            margin-top: 1rem;
+        }
+        .issue {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+        }
+        .issue.critical {
+            background-color: #ffebee;
+        }
+        .issue.major {
+            background-color: #fff8e1;
+        }
+        .issue.minor {
+            background-color: #e8f5e9;
+        }
+        .issue.info {
+            background-color: #e3f2fd;
+        }
+        button {
+            padding: 0.5rem 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        .tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        #loadTimeSimulator {
+            width: 100%;
+            height: 20px;
+            background-color: #eee;
+            margin: 10px 0;
+            position: relative;
+        }
+        #loadTimeProgress {
+            width: 0%;
+            height: 100%;
+            background-color: #4CAF50;
+            transition: width 0.5s;
+        }
+        .small-touch-target {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: #f1f1f1;
+            text-align: center;
+            line-height: 30px;
+            margin: 5px;
+            border-radius: 5px;
+        }
+        .image-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .image-container img {
+            width: 100%;
+            height: auto;
+        }
+        .responsive-table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        @media (max-width: 600px) {
+            .responsive {
+                margin-top: 20px;
+                background-color: #e8f5e9;
+                padding: 10px;
+                border-radius: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>성능 및 모바일 분석 테스트</h1>
+        <p>성능 및 모바일 친화성 분석 모듈 테스트 페이지입니다.</p>
+    </header>
+
+    <div class="container">
+        <h2>분석 도구</h2>
+        <button id="runAnalysis">분석 실행</button>
+        <button id="runPerformanceAnalysis">성능 분석만 실행</button>
+        <button id="runMobileAnalysis">모바일 분석만 실행</button>
+        
+        <div class="result-container" id="result">
+            <p>분석 버튼을 클릭하여 테스트를 시작하세요.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>성능 테스트 요소</h2>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="loadTime">로딩 시간</div>
+            <div class="tab" data-tab="resources">리소스</div>
+            <div class="tab" data-tab="rendering">렌더링</div>
+        </div>
+
+        <div class="tab-content active" id="loadTime">
+            <h3>로딩 시간 시뮬레이션</h3>
+            <p>이 섹션은 페이지 로딩 시간을 시뮬레이션합니다.</p>
+            <div id="loadTimeSimulator">
+                <div id="loadTimeProgress"></div>
+            </div>
+            <button id="simulateLoad">느린 로딩 시뮬레이션</button>
+        </div>
+
+        <div class="tab-content" id="resources">
+            <h3>리소스 최적화</h3>
+            <p>이 섹션은 다양한 리소스를 포함합니다.</p>
+
+            <h4>이미지</h4>
+            <div class="image-container">
+                <!-- 최적화되지 않은 이미지 (srcset 없음) -->
+                <img src="https://via.placeholder.com/400" width="400" height="400" alt="최적화되지 않은 이미지">
+                <img src="https://via.placeholder.com/400" width="400" height="400" alt="최적화되지 않은 이미지">
+                <img src="https://via.placeholder.com/400" width="400" height="400" alt="최적화되지 않은 이미지">
+                
+                <!-- 최적화된 이미지 (srcset 있음) -->
+                <img srcset="https://via.placeholder.com/200 200w, https://via.placeholder.com/400 400w"
+                    sizes="(max-width: 600px) 200px, 400px"
+                    src="https://via.placeholder.com/400"
+                    alt="최적화된 이미지">
+            </div>
+        </div>
+
+        <div class="tab-content" id="rendering">
+            <h3>렌더링 성능</h3>
+            <p>이 섹션은 렌더링 성능에 영향을 주는 요소를 포함합니다.</p>
+            
+            <h4>DOM 크기</h4>
+            <div id="largeDOM"></div>
+            <button id="generateDOM">대량 DOM 생성</button>
+            
+            <h4>애니메이션</h4>
+            <div id="animation" style="width: 50px; height: 50px; background-color: #4CAF50; position: relative;"></div>
+            <button id="startAnimation">애니메이션 시작</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>모바일 친화성 테스트 요소</h2>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="viewport">뷰포트</div>
+            <div class="tab" data-tab="touchTargets">터치 타겟</div>
+            <div class="tab" data-tab="responsive">반응형 디자인</div>
+        </div>
+
+        <div class="tab-content active" id="viewport">
+            <h3>뷰포트 설정</h3>
+            <p>이 페이지는 적절한 뷰포트 설정을 갖추고 있습니다: <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code></p>
+        </div>
+
+        <div class="tab-content" id="touchTargets">
+            <h3>터치 타겟 크기</h3>
+            <p>여러 크기의 터치 타겟:</p>
+            
+            <!-- 작은 터치 타겟 (44px 미만) -->
+            <div>
+                <span class="small-touch-target">A</span>
+                <span class="small-touch-target">B</span>
+                <span class="small-touch-target">C</span>
+            </div>
+            
+            <!-- 적절한 크기의 터치 타겟 (44px 이상) -->
+            <div style="margin-top: 20px;">
+                <button style="width: 44px; height: 44px; margin: 5px;">D</button>
+                <button style="width: 44px; height: 44px; margin: 5px;">E</button>
+                <button style="width: 44px; height: 44px; margin: 5px;">F</button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="responsive">
+            <h3>반응형 디자인</h3>
+            <p>이 섹션은 반응형 디자인 요소를 테스트합니다.</p>
+            
+            <!-- 고정 너비 요소 -->
+            <div style="width: 500px; background-color: #f1f1f1; padding: 10px; margin: 10px 0;">
+                이 요소는 고정 너비(500px)를 가지고 있습니다.
+            </div>
+            
+            <!-- 반응형 요소 -->
+            <div style="width: 100%; background-color: #e8f5e9; padding: 10px; margin: 10px 0;">
+                이 요소는 반응형 너비(100%)를 가지고 있습니다.
+            </div>
+            
+            <!-- 테이블 (수평 스크롤 발생 가능) -->
+            <h4>테이블</h4>
+            <div class="responsive-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>헤더 1</th>
+                            <th>헤더 2</th>
+                            <th>헤더 3</th>
+                            <th>헤더 4</th>
+                            <th>헤더 5</th>
+                            <th>헤더 6</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>데이터 1</td>
+                            <td>데이터 2</td>
+                            <td>데이터 3</td>
+                            <td>데이터 4</td>
+                            <td>데이터 5</td>
+                            <td>데이터 6</td>
+                        </tr>
+                        <tr>
+                            <td>데이터 7</td>
+                            <td>데이터 8</td>
+                            <td>데이터 9</td>
+                            <td>데이터 10</td>
+                            <td>데이터 11</td>
+                            <td>데이터 12</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 미디어 쿼리 테스트 -->
+            <div class="responsive">
+                이 요소는 화면 너비가 600px 이하일 때만 배경색과 스타일이 변경됩니다.
+            </div>
+        </div>
+    </div>
+    
+    <!-- 코어 JS 파일 로드 -->
+    <script src="/assets/js/core.js"></script>
+    
+    <!-- 유틸리티 JS 파일 로드 -->
+    <script src="/assets/js/utils/analyzer.js"></script>
+    <script src="/assets/js/utils/parser.js"></script>
+    <script src="/assets/js/utils/observer.js"></script>
+    <script src="/assets/js/utils/loader.js"></script>
+    
+    <!-- 성능 및 모바일 분석 모듈 로드 -->
+    <script src="/assets/js/analyzer/performance/index.js"></script>
+    <script src="/assets/js/analyzer/mobile/index.js"></script>
+    <script src="/assets/js/analyzer/performance-mobile.js"></script>
+    
+    <script>
+        // DOM 로드 후 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            // 네임스페이스 확인
+            if (!window.KoreanWebAnalyzer) {
+                window.KoreanWebAnalyzer = {
+                    logger: console,
+                    utils: {},
+                    analyzer: {}
+                };
+            }
+            
+            // 탭 기능
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // 탭 활성화
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 탭 콘텐츠 활성화
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // 로딩 시간 시뮬레이션
+            document.getElementById('simulateLoad').addEventListener('click', function() {
+                const progress = document.getElementById('loadTimeProgress');
+                progress.style.width = '0%';
+                
+                let width = 0;
+                const interval = setInterval(function() {
+                    if (width >= 100) {
+                        clearInterval(interval);
+                    } else {
+                        width += 2;
+                        progress.style.width = width + '%';
+                    }
+                }, 100);
+            });
+            
+            // 대량 DOM 생성
+            document.getElementById('generateDOM').addEventListener('click', function() {
+                const container = document.getElementById('largeDOM');
+                container.innerHTML = '';
+                
+                for (let i = 0; i < 500; i++) {
+                    const div = document.createElement('div');
+                    div.textContent = `DOM 요소 ${i}`;
+                    div.style.display = 'none';
+                    container.appendChild(div);
+                }
+                
+                alert('500개의 DOM 요소가 생성되었습니다.');
+            });
+            
+            // 애니메이션
+            document.getElementById('startAnimation').addEventListener('click', function() {
+                const element = document.getElementById('animation');
+                let pos = 0;
+                const interval = setInterval(function() {
+                    if (pos >= 200) {
+                        clearInterval(interval);
+                        element.style.left = '0px';
+                    } else {
+                        pos += 5;
+                        element.style.left = pos + 'px';
+                    }
+                }, 50);
+            });
+            
+            // 분석 실행
+            document.getElementById('runAnalysis').addEventListener('click', runCombinedAnalysis);
+            document.getElementById('runPerformanceAnalysis').addEventListener('click', runPerformanceAnalysis);
+            document.getElementById('runMobileAnalysis').addEventListener('click', runMobileAnalysis);
+            
+            // 통합 분석 실행
+            function runCombinedAnalysis() {
+                const resultContainer = document.getElementById('result');
+                resultContainer.innerHTML = '<p>분석 중입니다...</p>';
+                
+                try {
+                    // 성능 및 모바일 통합 분석 모듈이 있는지 확인
+                    if (window.KoreanWebAnalyzer.analyzer.performanceMobile) {
+                        const results = window.KoreanWebAnalyzer.analyzer.performanceMobile.analyze(document);
+                        displayResults(results, 'combined');
+                    } else {
+                        // 각 모듈을 개별적으로 실행
+                        const performanceResults = window.KoreanWebAnalyzer.analyzer.performance.analyze(document);
+                        const mobileResults = window.KoreanWebAnalyzer.analyzer.mobile.analyze(document);
+                        
+                        // 결과 통합
+                        const combinedResults = {
+                            score: Math.round((performanceResults.score * 0.6) + (mobileResults.score * 0.4)),
+                            performance: performanceResults,
+                            mobile: mobileResults
+                        };
+                        
+                        displayResults(combinedResults, 'combined');
+                    }
+                } catch (error) {
+                    resultContainer.innerHTML = `<p>오류 발생: ${error.message}</p>`;
+                    console.error('분석 중 오류 발생:', error);
+                }
+            }
+            
+            // 성능 분석 실행
+            function runPerformanceAnalysis() {
+                const resultContainer = document.getElementById('result');
+                resultContainer.innerHTML = '<p>성능 분석 중입니다...</p>';
+                
+                try {
+                    if (window.KoreanWebAnalyzer.analyzer.performance) {
+                        const results = window.KoreanWebAnalyzer.analyzer.performance.analyze(document);
+                        displayResults(results, 'performance');
+                    } else {
+                        resultContainer.innerHTML = '<p>성능 분석 모듈을 찾을 수 없습니다.</p>';
+                    }
+                } catch (error) {
+                    resultContainer.innerHTML = `<p>오류 발생: ${error.message}</p>`;
+                    console.error('성능 분석 중 오류 발생:', error);
+                }
+            }
+            
+            // 모바일 분석 실행
+            function runMobileAnalysis() {
+                const resultContainer = document.getElementById('result');
+                resultContainer.innerHTML = '<p>모바일 친화성 분석 중입니다...</p>';
+                
+                try {
+                    if (window.KoreanWebAnalyzer.analyzer.mobile) {
+                        const results = window.KoreanWebAnalyzer.analyzer.mobile.analyze(document);
+                        displayResults(results, 'mobile');
+                    } else {
+                        resultContainer.innerHTML = '<p>모바일 분석 모듈을 찾을 수 없습니다.</p>';
+                    }
+                } catch (error) {
+                    resultContainer.innerHTML = `<p>오류 발생: ${error.message}</p>`;
+                    console.error('모바일 분석 중 오류 발생:', error);
+                }
+            }
+            
+            // 결과 표시
+            function displayResults(results, type) {
+                const resultContainer = document.getElementById('result');
+                
+                // HTML 생성
+                let html = '';
+                
+                // 결과 유형에 따라 다른 내용 표시
+                if (type === 'combined') {
+                    html += `<div class="score">총 점수: ${results.score}/100</div>`;
+                    
+                    html += '<div class="score-category">성능 점수: ';
+                    html += `<div class="score-bar"><div class="score-value" style="width: ${results.performance.score}%;"></div></div>`;
+                    html += `${results.performance.score}/100</div>`;
+                    
+                    html += '<div class="score-category">모바일 친화성 점수: ';
+                    html += `<div class="score-bar"><div class="score-value" style="width: ${results.mobile.score}%;"></div></div>`;
+                    html += `${results.mobile.score}/100</div>`;
+                    
+                    // 주요 이슈 표시
+                    html += '<h3>주요 이슈</h3>';
+                    html += '<div class="issues-container">';
+                    
+                    // 성능 이슈
+                    if (results.performance.details) {
+                        for (const category in results.performance.details) {
+                            if (results.performance.details[category].issues) {
+                                results.performance.details[category].issues.forEach(issue => {
+                                    html += `<div class="issue ${issue.severity}">`;
+                                    html += `<strong>[성능 - ${category}] ${issue.message}</strong><br>`;
+                                    html += `${issue.details}<br>`;
+                                    if (issue.solution) {
+                                        html += `<em>해결 방법: ${issue.solution}</em>`;
+                                    }
+                                    html += '</div>';
+                                });
+                            }
+                        }
+                    }
+                    
+                    // 모바일 이슈
+                    if (results.mobile.details) {
+                        for (const category in results.mobile.details) {
+                            if (results.mobile.details[category].issues) {
+                                results.mobile.details[category].issues.forEach(issue => {
+                                    html += `<div class="issue ${issue.severity}">`;
+                                    html += `<strong>[모바일 - ${category}] ${issue.message}</strong><br>`;
+                                    html += `${issue.details}<br>`;
+                                    if (issue.solution) {
+                                        html += `<em>해결 방법: ${issue.solution}</em>`;
+                                    }
+                                    html += '</div>';
+                                });
+                            }
+                        }
+                    }
+                    
+                    html += '</div>';
+                } else if (type === 'performance') {
+                    html += `<div class="score">성능 점수: ${results.score}/100</div>`;
+                    
+                    // 카테고리별 점수
+                    for (const category in results.details) {
+                        html += `<div class="score-category">${category}: `;
+                        html += `<div class="score-bar"><div class="score-value" style="width: ${results.details[category].score}%;"></div></div>`;
+                        html += `${results.details[category].score}/100</div>`;
+                    }
+                    
+                    // 이슈 표시
+                    html += '<h3>성능 이슈</h3>';
+                    html += '<div class="issues-container">';
+                    
+                    for (const category in results.details) {
+                        if (results.details[category].issues) {
+                            results.details[category].issues.forEach(issue => {
+                                html += `<div class="issue ${issue.severity}">`;
+                                html += `<strong>[${category}] ${issue.message}</strong><br>`;
+                                html += `${issue.details}<br>`;
+                                if (issue.solution) {
+                                    html += `<em>해결 방법: ${issue.solution}</em>`;
+                                }
+                                html += '</div>';
+                            });
+                        }
+                    }
+                    
+                    html += '</div>';
+                } else if (type === 'mobile') {
+                    html += `<div class="score">모바일 친화성 점수: ${results.score}/100</div>`;
+                    
+                    // 카테고리별 점수
+                    for (const category in results.details) {
+                        html += `<div class="score-category">${category}: `;
+                        html += `<div class="score-bar"><div class="score-value" style="width: ${results.details[category].score}%;"></div></div>`;
+                        html += `${results.details[category].score}/100</div>`;
+                    }
+                    
+                    // 이슈 표시
+                    html += '<h3>모바일 친화성 이슈</h3>';
+                    html += '<div class="issues-container">';
+                    
+                    for (const category in results.details) {
+                        if (results.details[category].issues) {
+                            results.details[category].issues.forEach(issue => {
+                                html += `<div class="issue ${issue.severity}">`;
+                                html += `<strong>[${category}] ${issue.message}</strong><br>`;
+                                html += `${issue.details}<br>`;
+                                if (issue.solution) {
+                                    html += `<em>해결 방법: ${issue.solution}</em>`;
+                                }
+                                html += '</div>';
+                            });
+                        }
+                    }
+                    
+                    html += '</div>';
+                }
+                
+                resultContainer.innerHTML = html;
+                
+                // 점수 바 애니메이션
+                setTimeout(() => {
+                    const scoreValues = document.querySelectorAll('.score-value');
+                    scoreValues.forEach(value => {
+                        const width = value.style.width;
+                        value.style.width = '0%';
+                        setTimeout(() => {
+                            value.style.width = width;
+                        }, 100);
+                    });
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한국 웹 분석기 - 서버 기능 테스트</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/charts.css">
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/utils/analyzer.js"></script>
+    <script src="assets/js/utils/report-service.js"></script>
+    <script src="assets/js/analyzer/performance/index.js"></script>
+    <script src="assets/js/analyzer/mobile/index.js"></script>
+    <script src="assets/js/analyzer/security/index.js"></script>
+    <script src="assets/js/analyzer/report/index.js"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .test-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .test-section h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .input-group input, 
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .button-group {
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background-color: #3367d6;
+        }
+        
+        button.secondary {
+            background-color: #f1f3f4;
+            color: #202124;
+        }
+        
+        button.secondary:hover {
+            background-color: #e8eaed;
+        }
+        
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f1f3f4;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        
+        .tab.active {
+            background-color: #f1f3f4;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            border: 1px solid #ddd;
+            border-bottom: none;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .share-options {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f1f3f4;
+            border-radius: 5px;
+        }
+        
+        .share-result {
+            margin-top: 20px;
+        }
+        
+        .share-url {
+            padding: 15px;
+            background-color: #e1f5fe;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+        
+        .success {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        
+        .error {
+            color: #f44336;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>한국 웹 분석기 - 서버 기능 테스트</h1>
+        
+        <div class="tab-container">
+            <div class="tabs">
+                <div class="tab active" data-tab="analyze">분석 및 저장</div>
+                <div class="tab" data-tab="load">보고서 불러오기</div>
+                <div class="tab" data-tab="share">보고서 공유</div>
+                <div class="tab" data-tab="stats">통계 정보</div>
+            </div>
+        </div>
+        
+        <div class="tab-content active" id="analyze-tab">
+            <div class="test-section">
+                <h2>웹사이트 분석 및 보고서 저장</h2>
+                
+                <div class="input-group">
+                    <label for="analyze-url">분석할 URL:</label>
+                    <input type="url" id="analyze-url" placeholder="https://example.com" value="https://www.naver.com">
+                </div>
+                
+                <div class="button-group">
+                    <button id="analyze-btn">분석 및 저장</button>
+                    <button id="analyze-client-btn" class="secondary">클라이언트 분석만</button>
+                </div>
+                
+                <div id="analyze-result" class="result-container" style="display: none;"></div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="load-tab">
+            <div class="test-section">
+                <h2>저장된 보고서 불러오기</h2>
+                
+                <div class="input-group">
+                    <label for="report-id">보고서 ID:</label>
+                    <input type="text" id="report-id" placeholder="보고서 ID 입력">
+                </div>
+                
+                <div class="button-group">
+                    <button id="load-btn">보고서 불러오기</button>
+                </div>
+                
+                <div id="load-result" class="result-container" style="display: none;"></div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="share-tab">
+            <div class="test-section">
+                <h2>보고서 공유하기</h2>
+                
+                <div class="input-group">
+                    <label for="share-id">보고서 ID:</label>
+                    <input type="text" id="share-id" placeholder="공유할 보고서 ID 입력">
+                </div>
+                
+                <div class="share-options">
+                    <h3>공유 옵션</h3>
+                    
+                    <div class="input-group">
+                        <label for="expire-time">만료 시간:</label>
+                        <select id="expire-time">
+                            <option value="0">만료 없음</option>
+                            <option value="3600">1시간</option>
+                            <option value="86400">1일</option>
+                            <option value="604800">1주일</option>
+                            <option value="2592000">30일</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button id="share-btn">보고서 공유하기</button>
+                </div>
+                
+                <div class="share-result" style="display: none;">
+                    <h3>공유 링크</h3>
+                    <div class="share-url" id="share-url"></div>
+                    
+                    <div class="button-group">
+                        <button id="copy-url-btn">링크 복사</button>
+                        <button id="open-url-btn">새 창에서 열기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="stats-tab">
+            <div class="test-section">
+                <h2>통계 대시보드</h2>
+                
+                <p>현재 사용 통계와 분석 결과에 대한 상세 정보를 확인할 수 있습니다.</p>
+                
+                <div class="button-group">
+                    <button id="view-stats-btn">통계 대시보드 보기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 탭 전환 기능
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 현재 활성 탭 제거
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // 클릭한 탭 활성화
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab + '-tab').classList.add('active');
+                });
+            });
+            
+            // 분석 및 저장 기능
+            const analyzeBtn = document.getElementById('analyze-btn');
+            const analyzeClientBtn = document.getElementById('analyze-client-btn');
+            const analyzeUrlInput = document.getElementById('analyze-url');
+            const analyzeResult = document.getElementById('analyze-result');
+            
+            analyzeBtn.addEventListener('click', async function() {
+                const url = analyzeUrlInput.value.trim();
+                
+                if (!url) {
+                    alert('URL을 입력하세요.');
+                    return;
+                }
+                
+                analyzeBtn.disabled = true;
+                analyzeBtn.textContent = '분석 중...';
+                analyzeResult.style.display = 'none';
+                
+                try {
+                    // 보고서 생성
+                    const reportModule = window.KoreanWebAnalyzer.analyzer.report;
+                    const report = await generateReport(url);
+                    
+                    // 서버에 저장
+                    const saveResult = await reportModule.saveToServer(report, url);
+                    
+                    // 결과 표시
+                    analyzeResult.style.display = 'block';
+                    
+                    if (saveResult.success) {
+                        analyzeResult.innerHTML = `
+                            <div class="success">분석 및 저장 완료!</div>
+                            <div>보고서 ID: ${saveResult.id}</div>
+                            <div>전체 점수: ${report.score}</div>
+                            <div>요약: ${report.summary}</div>
+                            <div>카테고리 점수:</div>
+                            <ul>
+                                ${Object.entries(report.categoryScores).map(([category, score]) => 
+                                    `<li>${category}: ${score}</li>`).join('')}
+                            </ul>
+                        `;
+                        
+                        // 보고서 ID 자동 설정
+                        document.getElementById('report-id').value = saveResult.id;
+                        document.getElementById('share-id').value = saveResult.id;
+                    } else {
+                        analyzeResult.innerHTML = `
+                            <div class="error">저장 실패</div>
+                            <div>${saveResult.error || '알 수 없는 오류'}</div>
+                        `;
+                    }
+                } catch (error) {
+                    analyzeResult.style.display = 'block';
+                    analyzeResult.innerHTML = `
+                        <div class="error">오류 발생</div>
+                        <div>${error.message}</div>
+                    `;
+                } finally {
+                    analyzeBtn.disabled = false;
+                    analyzeBtn.textContent = '분석 및 저장';
+                }
+            });
+            
+            analyzeClientBtn.addEventListener('click', async function() {
+                const url = analyzeUrlInput.value.trim();
+                
+                if (!url) {
+                    alert('URL을 입력하세요.');
+                    return;
+                }
+                
+                analyzeClientBtn.disabled = true;
+                analyzeClientBtn.textContent = '분석 중...';
+                analyzeResult.style.display = 'none';
+                
+                try {
+                    // 클라이언트 측 분석만 실행
+                    const report = await generateReport(url);
+                    
+                    // 결과 표시
+                    analyzeResult.style.display = 'block';
+                    analyzeResult.innerHTML = `
+                        <div class="success">클라이언트 분석 완료!</div>
+                        <div>전체 점수: ${report.score}</div>
+                        <div>요약: ${report.summary}</div>
+                        <div>카테고리 점수:</div>
+                        <ul>
+                            ${Object.entries(report.categoryScores).map(([category, score]) => 
+                                `<li>${category}: ${score}</li>`).join('')}
+                        </ul>
+                        <div>주요 이슈 (${report.topIssues.length}):</div>
+                        <ul>
+                            ${report.topIssues.slice(0, 5).map(issue => 
+                                `<li>${issue.categoryName}: ${issue.message || issue.description}</li>`).join('')}
+                        </ul>
+                    `;
+                } catch (error) {
+                    analyzeResult.style.display = 'block';
+                    analyzeResult.innerHTML = `
+                        <div class="error">오류 발생</div>
+                        <div>${error.message}</div>
+                    `;
+                } finally {
+                    analyzeClientBtn.disabled = false;
+                    analyzeClientBtn.textContent = '클라이언트 분석만';
+                }
+            });
+            
+            // 보고서 불러오기 기능
+            const loadBtn = document.getElementById('load-btn');
+            const reportIdInput = document.getElementById('report-id');
+            const loadResult = document.getElementById('load-result');
+            
+            loadBtn.addEventListener('click', async function() {
+                const reportId = reportIdInput.value.trim();
+                
+                if (!reportId) {
+                    alert('보고서 ID를 입력하세요.');
+                    return;
+                }
+                
+                loadBtn.disabled = true;
+                loadBtn.textContent = '불러오는 중...';
+                loadResult.style.display = 'none';
+                
+                try {
+                    const reportModule = window.KoreanWebAnalyzer.analyzer.report;
+                    const report = await reportModule.loadFromServer(reportId);
+                    
+                    loadResult.style.display = 'block';
+                    
+                    if (report.error) {
+                        loadResult.innerHTML = `
+                            <div class="error">불러오기 실패</div>
+                            <div>${report.error}</div>
+                        `;
+                    } else {
+                        loadResult.innerHTML = `
+                            <div class="success">보고서 불러오기 완료!</div>
+                            <div>URL: ${report.url}</div>
+                            <div>전체 점수: ${report.overall_score}</div>
+                            <div>생성 시간: ${new Date(report.timestamp).toLocaleString()}</div>
+                            <div>요약: ${report.summary}</div>
+                            <div>카테고리 점수:</div>
+                            <ul>
+                                ${report.performance ? `<li>성능: ${report.performance.score}</li>` : ''}
+                                ${report.mobile ? `<li>모바일: ${report.mobile.score}</li>` : ''}
+                                ${report.security ? `<li>보안: ${report.security.score}</li>` : ''}
+                            </ul>
+                        `;
+                        
+                        // 공유 탭의 보고서 ID 자동 설정
+                        document.getElementById('share-id').value = reportId;
+                    }
+                } catch (error) {
+                    loadResult.style.display = 'block';
+                    loadResult.innerHTML = `
+                        <div class="error">오류 발생</div>
+                        <div>${error.message}</div>
+                    `;
+                } finally {
+                    loadBtn.disabled = false;
+                    loadBtn.textContent = '보고서 불러오기';
+                }
+            });
+            
+            // 보고서 공유 기능
+            const shareBtn = document.getElementById('share-btn');
+            const shareIdInput = document.getElementById('share-id');
+            const expireTimeSelect = document.getElementById('expire-time');
+            const shareResult = document.querySelector('.share-result');
+            const shareUrlElement = document.getElementById('share-url');
+            const copyUrlBtn = document.getElementById('copy-url-btn');
+            const openUrlBtn = document.getElementById('open-url-btn');
+            
+            shareBtn.addEventListener('click', async function() {
+                const reportId = shareIdInput.value.trim();
+                const expireTime = Number(expireTimeSelect.value);
+                
+                if (!reportId) {
+                    alert('보고서 ID를 입력하세요.');
+                    return;
+                }
+                
+                shareBtn.disabled = true;
+                shareBtn.textContent = '공유 중...';
+                shareResult.style.display = 'none';
+                
+                try {
+                    const reportModule = window.KoreanWebAnalyzer.analyzer.report;
+                    const options = {};
+                    
+                    if (expireTime > 0) {
+                        options.expires_in = expireTime;
+                    }
+                    
+                    const shareResult = await reportModule.shareReport(reportId, options);
+                    
+                    if (shareResult.success) {
+                        shareUrlElement.textContent = shareResult.url;
+                        document.querySelector('.share-result').style.display = 'block';
+                    } else {
+                        alert('공유 실패: ' + (shareResult.error || '알 수 없는 오류'));
+                    }
+                } catch (error) {
+                    alert('오류 발생: ' + error.message);
+                } finally {
+                    shareBtn.disabled = false;
+                    shareBtn.textContent = '보고서 공유하기';
+                }
+            });
+            
+            copyUrlBtn.addEventListener('click', function() {
+                const shareUrl = shareUrlElement.textContent;
+                navigator.clipboard.writeText(shareUrl)
+                    .then(() => alert('링크가 클립보드에 복사되었습니다.'))
+                    .catch(err => alert('복사 실패: ' + err.message));
+            });
+            
+            openUrlBtn.addEventListener('click', function() {
+                const shareUrl = shareUrlElement.textContent;
+                window.open(shareUrl, '_blank');
+            });
+            
+            // 통계 대시보드 보기
+            const viewStatsBtn = document.getElementById('view-stats-btn');
+            viewStatsBtn.addEventListener('click', function() {
+                window.open('server/stats-dashboard.php', '_blank');
+            });
+            
+            // 보고서 생성 함수
+            async function generateReport(url) {
+                return new Promise((resolve, reject) => {
+                    try {
+                        // 임시 보고서 생성 (프레임워크 단순화를 위한 직접 인스턴스화)
+                        const performanceAnalyzer = new window.KoreanWebAnalyzer.analyzer.performance.PerformanceAnalyzer();
+                        const mobileAnalyzer = new window.KoreanWebAnalyzer.analyzer.mobile.MobileAnalyzer();
+                        const securityAnalyzer = new window.KoreanWebAnalyzer.analyzer.security.SecurityAnalyzer();
+                        
+                        const performance = performanceAnalyzer.analyzeMock();
+                        const mobile = mobileAnalyzer.analyzeMock();
+                        const security = securityAnalyzer.analyzeMock();
+                        
+                        // 모의 분석 결과로 리포트 생성
+                        window.KoreanWebAnalyzer.analyzer.performance.analyze = () => performance;
+                        window.KoreanWebAnalyzer.analyzer.mobile.analyze = () => mobile;
+                        window.KoreanWebAnalyzer.analyzer.security.analyze = () => security;
+                        
+                        // 종합 보고서 생성
+                        const report = window.KoreanWebAnalyzer.analyzer.report.generate(document);
+                        
+                        resolve(report);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

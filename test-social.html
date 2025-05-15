@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한국 웹 분석기 - 소셜 미디어 최적화 테스트</title>
+    
+    <!-- 테스트용 Open Graph 태그 -->
+    <meta property="og:title" content="한국 웹 분석기 - 소셜 미디어 테스트">
+    <meta property="og:description" content="웹사이트의 소셜 미디어 최적화 상태를 분석하는 테스트 페이지입니다.">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630">
+    <meta property="og:url" content="https://example.com/test-social.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="한국 웹 분석기">
+    
+    <!-- 테스트용 Twitter Cards 태그 -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="한국 웹 분석기 - 트위터 카드 테스트">
+    <meta name="twitter:description" content="트위터 카드를 통한 최적화된 공유 경험을 테스트합니다.">
+    <meta name="twitter:image" content="https://via.placeholder.com/1200x675">
+    <meta name="twitter:site" content="@KoreanWebAnalyzer">
+    <meta name="twitter:image:alt" content="한국 웹 분석기 로고 이미지">
+    
+    <!-- 스타일 -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .test-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .test-section h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        
+        .button-group {
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background-color: #3367d6;
+        }
+        
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f1f3f4;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        
+        .result-details {
+            margin-top: 20px;
+        }
+        
+        .score-card {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .score-item {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .score-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .good {
+            color: #4caf50;
+        }
+        
+        .moderate {
+            color: #ff9800;
+        }
+        
+        .poor {
+            color: #f44336;
+        }
+        
+        .issues-list, .recommendations-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .issue-item, .recommendation-item {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 5px;
+        }
+        
+        .issue-item {
+            border-left: 4px solid #ccc;
+        }
+        
+        .issue-item.critical {
+            border-left-color: #f44336;
+            background-color: rgba(244, 67, 54, 0.05);
+        }
+        
+        .issue-item.major {
+            border-left-color: #ff9800;
+            background-color: rgba(255, 152, 0, 0.05);
+        }
+        
+        .issue-item.minor {
+            border-left-color: #4caf50;
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+        
+        .issue-item.info {
+            border-left-color: #2196f3;
+            background-color: rgba(33, 150, 243, 0.05);
+        }
+        
+        .recommendation-item {
+            border-left: 4px solid #ccc;
+        }
+        
+        .recommendation-item.high {
+            border-left-color: #f44336;
+            background-color: rgba(244, 67, 54, 0.05);
+        }
+        
+        .recommendation-item.medium {
+            border-left-color: #ff9800;
+            background-color: rgba(255, 152, 0, 0.05);
+        }
+        
+        .recommendation-item.low {
+            border-left-color: #4caf50;
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+        
+        .tag-list {
+            margin-top: 20px;
+        }
+        
+        .tag-item {
+            font-family: monospace;
+            padding: 8px;
+            margin-bottom: 8px;
+            background-color: #f1f3f4;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        
+        .meta-editor {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .meta-editor h3 {
+            margin-top: 0;
+        }
+        
+        .meta-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        
+        .tab.active {
+            background-color: #f1f3f4;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            border: 1px solid #ddd;
+            border-bottom: none;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>한국 웹 분석기 - 소셜 미디어 최적화 테스트</h1>
+        
+        <div class="test-section">
+            <h2>소셜 미디어 최적화 분석</h2>
+            <p>이 페이지는 소셜 미디어 최적화 모듈을 테스트하기 위한 페이지입니다. Open Graph, Twitter Cards 등의 메타 태그를 분석하고 최적화 상태를 평가합니다.</p>
+            
+            <div class="button-group">
+                <button id="analyze-btn">페이지 분석하기</button>
+                <button id="mock-btn">모의 분석 실행</button>
+            </div>
+            
+            <div class="result-container" id="result-container" style="display: none;">
+                <div class="score-card">
+                    <div class="score-item">
+                        <div class="score-label">종합 점수</div>
+                        <div class="score-value" id="overall-score">-</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Open Graph 점수</div>
+                        <div class="score-value" id="og-score">-</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Twitter Cards 점수</div>
+                        <div class="score-value" id="twitter-score">-</div>
+                    </div>
+                </div>
+                
+                <div id="summary"></div>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="issues">발견된 이슈</div>
+                    <div class="tab" data-tab="recommendations">권장사항</div>
+                    <div class="tab" data-tab="tags">감지된 태그</div>
+                </div>
+                
+                <div class="tab-content active" id="issues-tab">
+                    <h3>발견된 이슈</h3>
+                    <ul class="issues-list" id="issues-list"></ul>
+                </div>
+                
+                <div class="tab-content" id="recommendations-tab">
+                    <h3>권장사항</h3>
+                    <ul class="recommendations-list" id="recommendations-list"></ul>
+                </div>
+                
+                <div class="tab-content" id="tags-tab">
+                    <h3>감지된 태그</h3>
+                    <div class="tag-list" id="tags-list"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="meta-editor">
+            <h3>메타 태그 에디터</h3>
+            <p>아래 양식을 통해 페이지의 메타 태그를 수정하고 결과를 테스트할 수 있습니다.</p>
+            
+            <div class="tabs">
+                <div class="tab active" data-tab="og-form">Open Graph 태그</div>
+                <div class="tab" data-tab="twitter-form">Twitter Cards 태그</div>
+            </div>
+            
+            <div class="tab-content active" id="og-form-tab">
+                <div class="meta-form">
+                    <div class="form-group">
+                        <label for="og-title">og:title</label>
+                        <input type="text" id="og-title" value="한국 웹 분석기 - 소셜 미디어 테스트">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="og-description">og:description</label>
+                        <input type="text" id="og-description" value="웹사이트의 소셜 미디어 최적화 상태를 분석하는 테스트 페이지입니다.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="og-image">og:image</label>
+                        <input type="text" id="og-image" value="https://via.placeholder.com/1200x630">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="og-url">og:url</label>
+                        <input type="text" id="og-url" value="https://example.com/test-social.html">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="og-type">og:type</label>
+                        <input type="text" id="og-type" value="website">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="og-site-name">og:site_name</label>
+                        <input type="text" id="og-site-name" value="한국 웹 분석기">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="twitter-form-tab">
+                <div class="meta-form">
+                    <div class="form-group">
+                        <label for="twitter-card">twitter:card</label>
+                        <input type="text" id="twitter-card" value="summary_large_image">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="twitter-title">twitter:title</label>
+                        <input type="text" id="twitter-title" value="한국 웹 분석기 - 트위터 카드 테스트">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="twitter-description">twitter:description</label>
+                        <input type="text" id="twitter-description" value="트위터 카드를 통한 최적화된 공유 경험을 테스트합니다.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="twitter-image">twitter:image</label>
+                        <input type="text" id="twitter-image" value="https://via.placeholder.com/1200x675">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="twitter-site">twitter:site</label>
+                        <input type="text" id="twitter-site" value="@KoreanWebAnalyzer">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="twitter-image-alt">twitter:image:alt</label>
+                        <input type="text" id="twitter-image-alt" value="한국 웹 분석기 로고 이미지">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button id="update-meta-btn">메타 태그 업데이트</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 코어 스크립트 로드 -->
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/utils/analyzer.js"></script>
+    
+    <!-- 소셜 미디어 분석 모듈 로드 -->
+    <script src="assets/js/analyzer/social/open-graph.js"></script>
+    <script src="assets/js/analyzer/social/twitter-cards.js"></script>
+    <script src="assets/js/analyzer/social/image-verification.js"></script>
+    <script src="assets/js/analyzer/social/sharing-functionality.js"></script>
+    <script src="assets/js/analyzer/social/index.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 요소 참조
+            const analyzeBtn = document.getElementById('analyze-btn');
+            const mockBtn = document.getElementById('mock-btn');
+            const resultContainer = document.getElementById('result-container');
+            const overallScoreEl = document.getElementById('overall-score');
+            const ogScoreEl = document.getElementById('og-score');
+            const twitterScoreEl = document.getElementById('twitter-score');
+            const summaryEl = document.getElementById('summary');
+            const issuesList = document.getElementById('issues-list');
+            const recommendationsList = document.getElementById('recommendations-list');
+            const tagsList = document.getElementById('tags-list');
+            const updateMetaBtn = document.getElementById('update-meta-btn');
+            
+            // 탭 전환 기능
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 현재 활성 탭 제거
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // 클릭한 탭 활성화
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab + '-tab').classList.add('active');
+                });
+            });
+            
+            // 실제 분석 실행
+            analyzeBtn.addEventListener('click', function() {
+                const socialAnalyzer = window.KoreanWebAnalyzer.analyzer.social;
+                
+                if (!socialAnalyzer) {
+                    alert('소셜 미디어 분석 모듈이 로드되지 않았습니다.');
+                    return;
+                }
+                
+                try {
+                    const results = socialAnalyzer.analyze();
+                    displayResults(results);
+                } catch (error) {
+                    alert('분석 중 오류가 발생했습니다: ' + error.message);
+                    console.error(error);
+                }
+            });
+            
+            // 모의 분석 실행
+            mockBtn.addEventListener('click', function() {
+                const socialAnalyzer = window.KoreanWebAnalyzer.analyzer.social;
+                
+                if (!socialAnalyzer) {
+                    alert('소셜 미디어 분석 모듈이 로드되지 않았습니다.');
+                    return;
+                }
+                
+                try {
+                    const results = socialAnalyzer.analyzeMock();
+                    displayResults(results);
+                } catch (error) {
+                    alert('모의 분석 중 오류가 발생했습니다: ' + error.message);
+                    console.error(error);
+                }
+            });
+            
+            // 메타 태그 업데이트
+            updateMetaBtn.addEventListener('click', function() {
+                // 기존 Open Graph 태그 제거
+                document.querySelectorAll('meta[property^="og:"]').forEach(tag => tag.remove());
+                
+                // 기존 Twitter Cards 태그 제거
+                document.querySelectorAll('meta[name^="twitter:"]').forEach(tag => tag.remove());
+                
+                // Open Graph 태그 추가
+                updateMetaTagProperty('og:title', document.getElementById('og-title').value);
+                updateMetaTagProperty('og:description', document.getElementById('og-description').value);
+                updateMetaTagProperty('og:image', document.getElementById('og-image').value);
+                updateMetaTagProperty('og:url', document.getElementById('og-url').value);
+                updateMetaTagProperty('og:type', document.getElementById('og-type').value);
+                updateMetaTagProperty('og:site_name', document.getElementById('og-site-name').value);
+                
+                // Twitter Cards 태그 추가
+                updateMetaTagName('twitter:card', document.getElementById('twitter-card').value);
+                updateMetaTagName('twitter:title', document.getElementById('twitter-title').value);
+                updateMetaTagName('twitter:description', document.getElementById('twitter-description').value);
+                updateMetaTagName('twitter:image', document.getElementById('twitter-image').value);
+                updateMetaTagName('twitter:site', document.getElementById('twitter-site').value);
+                updateMetaTagName('twitter:image:alt', document.getElementById('twitter-image-alt').value);
+                
+                alert('메타 태그가 업데이트되었습니다. 다시 분석해보세요.');
+            });
+            
+            // property 속성의 메타 태그 업데이트 함수
+            function updateMetaTagProperty(property, content) {
+                if (!content) return;
+                
+                const meta = document.createElement('meta');
+                meta.setAttribute('property', property);
+                meta.setAttribute('content', content);
+                document.head.appendChild(meta);
+            }
+            
+            // name 속성의 메타 태그 업데이트 함수
+            function updateMetaTagName(name, content) {
+                if (!content) return;
+                
+                const meta = document.createElement('meta');
+                meta.setAttribute('name', name);
+                meta.setAttribute('content', content);
+                document.head.appendChild(meta);
+            }
+            
+            // 결과 표시 함수
+            function displayResults(results) {
+                // 점수 표시
+                overallScoreEl.textContent = results.score;
+                overallScoreEl.className = 'score-value ' + getScoreClass(results.score);
+                
+                // Open Graph 점수
+                if (results.details.openGraph) {
+                    ogScoreEl.textContent = results.details.openGraph.score;
+                    ogScoreEl.className = 'score-value ' + getScoreClass(results.details.openGraph.score);
+                }
+                
+                // Twitter Cards 점수 (추후 구현 시)
+                if (results.details.twitterCards) {
+                    twitterScoreEl.textContent = results.details.twitterCards.score;
+                    twitterScoreEl.className = 'score-value ' + getScoreClass(results.details.twitterCards.score);
+                } else {
+                    twitterScoreEl.textContent = 'N/A';
+                    twitterScoreEl.className = 'score-value';
+                }
+                
+                // 요약 표시
+                summaryEl.textContent = results.summary;
+                
+                // 이슈 목록 표시
+                issuesList.innerHTML = '';
+                if (results.issues.length === 0) {
+                    issuesList.innerHTML = '<li>발견된 이슈가 없습니다.</li>';
+                } else {
+                    results.issues.forEach(issue => {
+                        const issueItem = document.createElement('li');
+                        issueItem.className = 'issue-item ' + (issue.severity || 'minor');
+                        
+                        const componentLabel = document.createElement('span');
+                        componentLabel.className = 'component-label';
+                        componentLabel.textContent = getComponentName(issue.component);
+                        
+                        const issueDesc = document.createElement('div');
+                        issueDesc.className = 'issue-description';
+                        issueDesc.textContent = issue.description;
+                        
+                        const issueSolution = document.createElement('div');
+                        issueSolution.className = 'issue-solution';
+                        issueSolution.textContent = issue.solution || '';
+                        
+                        issueItem.appendChild(componentLabel);
+                        issueItem.appendChild(issueDesc);
+                        issueItem.appendChild(issueSolution);
+                        
+                        issuesList.appendChild(issueItem);
+                    });
+                }
+                
+                // 권장사항 목록 표시
+                recommendationsList.innerHTML = '';
+                if (results.recommendations.length === 0) {
+                    recommendationsList.innerHTML = '<li>권장사항이 없습니다.</li>';
+                } else {
+                    results.recommendations.forEach(rec => {
+                        const recItem = document.createElement('li');
+                        recItem.className = 'recommendation-item ' + (rec.priority || 'medium');
+                        recItem.textContent = rec.description;
+                        recommendationsList.appendChild(recItem);
+                    });
+                }
+                
+                // 태그 목록 표시
+                tagsList.innerHTML = '';
+                if (results.details.openGraph && results.details.openGraph.tags) {
+                    const ogTags = results.details.openGraph.tags;
+                    for (const [property, content] of Object.entries(ogTags)) {
+                        const tagItem = document.createElement('div');
+                        tagItem.className = 'tag-item';
+                        tagItem.textContent = `<meta property="${property}" content="${content}">`;
+                        tagsList.appendChild(tagItem);
+                    }
+                }
+                
+                // 결과 컨테이너 표시
+                resultContainer.style.display = 'block';
+            }
+            
+            // 점수에 따른 CSS 클래스 반환
+            function getScoreClass(score) {
+                if (score >= 80) return 'good';
+                if (score >= 50) return 'moderate';
+                return 'poor';
+            }
+            
+            // 컴포넌트 ID를 표시명으로 변환
+            function getComponentName(componentId) {
+                const componentNames = {
+                    'openGraph': 'Open Graph',
+                    'twitterCards': 'Twitter Cards',
+                    'sharingFunctionality': '공유 기능',
+                    'imageVerification': '이미지 검증'
+                };
+                
+                return componentNames[componentId] || componentId;
+            }
+        });
+    </script>
+</body>
+</html>

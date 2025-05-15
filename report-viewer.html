@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한국 웹 분석기 - 보고서 뷰어</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/charts.css">
+    <style>
+        .report-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        
+        .report-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .report-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .report-meta {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .report-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .score-card {
+            flex: 1;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin: 0 10px;
+        }
+        
+        .score-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .score-label {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .recommendation-section {
+            margin-bottom: 30px;
+        }
+        
+        .recommendation-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .recommendation-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .recommendation-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-left: 3px solid #ccc;
+        }
+        
+        .recommendation-item.high {
+            border-left-color: #ff5252;
+            background-color: rgba(255, 82, 82, 0.05);
+        }
+        
+        .recommendation-item.medium {
+            border-left-color: #ffb74d;
+            background-color: rgba(255, 183, 77, 0.05);
+        }
+        
+        .recommendation-item.low {
+            border-left-color: #4caf50;
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+        
+        .error-message {
+            text-align: center;
+            padding: 50px;
+            color: #ff5252;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+        
+        .expired-message {
+            text-align: center;
+            padding: 50px;
+            color: #ff5252;
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container" id="reportContainer">
+        <div class="loading">보고서를 불러오는 중입니다...</div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // URL에서 공유 ID 가져오기
+            const params = new URLSearchParams(window.location.search);
+            const shareId = params.get('share');
+            
+            if (!shareId) {
+                showError('유효한 공유 ID가 없습니다.');
+                return;
+            }
+            
+            // 보고서 불러오기
+            fetchSharedReport(shareId);
+        });
+        
+        async function fetchSharedReport(shareId) {
+            try {
+                const response = await fetch(`server/api.php?action=get_shared_report&share_id=${shareId}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    if (data.error.includes('expired')) {
+                        showExpired();
+                    } else {
+                        showError(data.error);
+                    }
+                    return;
+                }
+                
+                renderReport(data);
+            } catch (error) {
+                showError('보고서를 불러오는 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+        
+        function renderReport(report) {
+            const container = document.getElementById('reportContainer');
+            
+            // 로딩 표시 제거
+            container.innerHTML = '';
+            
+            // 보고서 헤더
+            const header = document.createElement('div');
+            header.className = 'report-header';
+            
+            const title = document.createElement('div');
+            title.className = 'report-title';
+            title.textContent = '웹사이트 분석 보고서: ' + (report.url || '알 수 없는 URL');
+            
+            const meta = document.createElement('div');
+            meta.className = 'report-meta';
+            
+            const shareInfo = report.share_info || {};
+            const createdAt = shareInfo.created_at ? new Date(shareInfo.created_at).toLocaleString('ko-KR') : '알 수 없음';
+            
+            meta.innerHTML = `
+                생성 일시: ${createdAt}<br>
+                ${shareInfo.expires_at ? '만료 일시: ' + new Date(shareInfo.expires_at).toLocaleString('ko-KR') : ''}
+            `;
+            
+            header.appendChild(title);
+            header.appendChild(meta);
+            container.appendChild(header);
+            
+            // 점수 요약
+            const summary = document.createElement('div');
+            summary.className = 'report-summary';
+            
+            // 전체 점수
+            const overallScoreCard = createScoreCard('전체 점수', report.overall_score || 0);
+            summary.appendChild(overallScoreCard);
+            
+            // 성능 점수
+            const performanceScoreCard = createScoreCard('성능 점수', report.performance?.score || 0);
+            summary.appendChild(performanceScoreCard);
+            
+            // 모바일 점수
+            const mobileScoreCard = createScoreCard('모바일 점수', report.mobile?.score || 0);
+            summary.appendChild(mobileScoreCard);
+            
+            // 보안 점수
+            const securityScoreCard = createScoreCard('보안 점수', report.security?.score || 0);
+            summary.appendChild(securityScoreCard);
+            
+            container.appendChild(summary);
+            
+            // 우선순위 높은 개선 사항
+            const highPrioritySection = createRecommendationSection('우선순위 높은 개선 사항', report.prioritized_recommendations?.high || []);
+            container.appendChild(highPrioritySection);
+            
+            // 중간 우선순위 개선 사항
+            const mediumPrioritySection = createRecommendationSection('중간 우선순위 개선 사항', report.prioritized_recommendations?.medium || []);
+            container.appendChild(mediumPrioritySection);
+            
+            // 낮은 우선순위 개선 사항
+            const lowPrioritySection = createRecommendationSection('낮은 우선순위 개선 사항', report.prioritized_recommendations?.low || []);
+            container.appendChild(lowPrioritySection);
+            
+            // 분석 결과 상세 정보
+            if (report.performance?.issues || report.mobile?.issues || report.security?.issues) {
+                const detailsSection = document.createElement('div');
+                detailsSection.className = 'recommendation-section';
+                
+                const detailsTitle = document.createElement('h2');
+                detailsTitle.textContent = '상세 분석 결과';
+                detailsSection.appendChild(detailsTitle);
+                
+                // 성능 이슈
+                if (report.performance?.issues && report.performance.issues.length > 0) {
+                    const performanceSection = createIssueSection('성능 이슈', report.performance.issues);
+                    detailsSection.appendChild(performanceSection);
+                }
+                
+                // 모바일 이슈
+                if (report.mobile?.issues && report.mobile.issues.length > 0) {
+                    const mobileSection = createIssueSection('모바일 이슈', report.mobile.issues);
+                    detailsSection.appendChild(mobileSection);
+                }
+                
+                // 보안 이슈
+                if (report.security?.issues && report.security.issues.length > 0) {
+                    const securitySection = createIssueSection('보안 이슈', report.security.issues);
+                    detailsSection.appendChild(securitySection);
+                }
+                
+                container.appendChild(detailsSection);
+            }
+            
+            // 서버 분석 결과 (있는 경우)
+            if (report.server_analysis) {
+                const serverSection = document.createElement('div');
+                serverSection.className = 'recommendation-section';
+                
+                const serverTitle = document.createElement('h2');
+                serverTitle.textContent = '서버 분석 결과';
+                serverSection.appendChild(serverTitle);
+                
+                // 서버 점수
+                const serverScoreCard = createScoreCard('서버 점수', report.server_analysis.score || 0);
+                serverSection.appendChild(serverScoreCard);
+                
+                // SEO 이슈
+                if (report.server_analysis.seo?.issues && report.server_analysis.seo.issues.length > 0) {
+                    const seoSection = createIssueSection('SEO 이슈', report.server_analysis.seo.issues);
+                    serverSection.appendChild(seoSection);
+                }
+                
+                // 보안 이슈
+                if (report.server_analysis.security?.issues && report.server_analysis.security.issues.length > 0) {
+                    const securitySection = createIssueSection('서버 보안 이슈', report.server_analysis.security.issues);
+                    serverSection.appendChild(securitySection);
+                }
+                
+                container.appendChild(serverSection);
+            }
+            
+            // PDF 다운로드 버튼
+            const downloadSection = document.createElement('div');
+            downloadSection.style.textAlign = 'center';
+            downloadSection.style.marginTop = '30px';
+            
+            const downloadButton = document.createElement('button');
+            downloadButton.textContent = 'PDF로 다운로드';
+            downloadButton.style.padding = '10px 20px';
+            downloadButton.style.background = '#4285f4';
+            downloadButton.style.color = 'white';
+            downloadButton.style.border = 'none';
+            downloadButton.style.borderRadius = '4px';
+            downloadButton.style.cursor = 'pointer';
+            
+            downloadButton.addEventListener('click', function() {
+                // PDF 다운로드 기능은 서버 기능 구현 후 연결
+                alert('PDF 다운로드 기능은 준비 중입니다.');
+            });
+            
+            downloadSection.appendChild(downloadButton);
+            container.appendChild(downloadSection);
+            
+            // 푸터
+            const footer = document.createElement('div');
+            footer.style.marginTop = '50px';
+            footer.style.textAlign = 'center';
+            footer.style.color = '#666';
+            footer.style.fontSize = '14px';
+            footer.innerHTML = '&copy; 2023 한국 웹 분석기. 모든 권리 보유.';
+            
+            container.appendChild(footer);
+        }
+        
+        function createScoreCard(label, score) {
+            const card = document.createElement('div');
+            card.className = 'score-card';
+            
+            const scoreValue = document.createElement('div');
+            scoreValue.className = 'score-value';
+            scoreValue.textContent = score;
+            
+            // 점수에 따른 색상
+            if (score >= 80) {
+                scoreValue.style.color = '#4caf50'; // 초록색
+            } else if (score >= 60) {
+                scoreValue.style.color = '#ff9800'; // 주황색
+            } else {
+                scoreValue.style.color = '#f44336'; // 빨간색
+            }
+            
+            const scoreLabel = document.createElement('div');
+            scoreLabel.className = 'score-label';
+            scoreLabel.textContent = label;
+            
+            card.appendChild(scoreValue);
+            card.appendChild(scoreLabel);
+            
+            return card;
+        }
+        
+        function createRecommendationSection(title, recommendations) {
+            const section = document.createElement('div');
+            section.className = 'recommendation-section';
+            
+            const sectionTitle = document.createElement('div');
+            sectionTitle.className = 'recommendation-title';
+            sectionTitle.textContent = title;
+            
+            section.appendChild(sectionTitle);
+            
+            if (recommendations.length === 0) {
+                const emptyMessage = document.createElement('p');
+                emptyMessage.textContent = '해당 항목이 없습니다.';
+                section.appendChild(emptyMessage);
+                return section;
+            }
+            
+            const list = document.createElement('ul');
+            list.className = 'recommendation-list';
+            
+            recommendations.forEach(rec => {
+                const item = document.createElement('li');
+                item.className = 'recommendation-item ' + (rec.severity || 'medium');
+                item.textContent = rec.description || rec.message;
+                list.appendChild(item);
+            });
+            
+            section.appendChild(list);
+            return section;
+        }
+        
+        function createIssueSection(title, issues) {
+            const section = document.createElement('div');
+            section.className = 'recommendation-section';
+            
+            const sectionTitle = document.createElement('h3');
+            sectionTitle.textContent = title;
+            section.appendChild(sectionTitle);
+            
+            const list = document.createElement('ul');
+            list.className = 'recommendation-list';
+            
+            issues.forEach(issue => {
+                const item = document.createElement('li');
+                item.className = 'recommendation-item ' + (issue.severity || 'medium');
+                item.textContent = issue.description;
+                list.appendChild(item);
+            });
+            
+            section.appendChild(list);
+            return section;
+        }
+        
+        function showError(message) {
+            const container = document.getElementById('reportContainer');
+            container.innerHTML = `<div class="error-message">${message}</div>`;
+        }
+        
+        function showExpired() {
+            const container = document.getElementById('reportContainer');
+            container.innerHTML = `
+                <div class="expired-message">
+                    <h2>만료된 보고서</h2>
+                    <p>이 공유 링크는 만료되었습니다.</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

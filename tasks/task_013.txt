@@ -1,0 +1,108 @@
+# Task ID: 13
+# Title: Task #13: Core Web Vitals Analysis Module Development
+# Status: done
+# Dependencies: 1, 7
+# Priority: high
+# Description: Develop a module that analyzes and measures Core Web Vitals metrics (LCP, FID, CLS) as specified in PRD sections 4.3 and 1.7, with components to estimate metrics, identify affecting elements, and provide optimization recommendations.
+# Details:
+This task involves implementing a comprehensive Core Web Vitals analysis module that integrates with the existing bookmarklet core structure (Task #1) and extends the performance analysis module (Task #7).
+
+Key implementation components:
+1. Metric measurement implementation:
+   - Largest Contentful Paint (LCP): Track and measure the render time of the largest content element visible within the viewport
+   - First Input Delay (FID): Measure the time from when a user first interacts with the page to when the browser is able to respond to that interaction
+   - Cumulative Layout Shift (CLS): Calculate the sum of all individual layout shift scores for unexpected layout shifts during the page lifecycle
+
+2. Element identification system:
+   - Develop algorithms to identify specific DOM elements contributing to poor Core Web Vitals scores
+   - Create visual highlighting mechanisms to pinpoint problematic elements directly on the analyzed page
+   - Implement element attribution to connect metrics with specific page components
+
+3. Recommendation engine:
+   - Create a rule-based system that generates specific optimization recommendations based on detected issues
+   - Categorize recommendations by impact level (high/medium/low) and implementation difficulty
+   - Include code snippets or specific technical guidance where applicable
+
+4. Integration requirements:
+   - Ensure the module works with the bookmarklet core structure from Task #1
+   - Extend the performance analysis module from Task #7 with Core Web Vitals specific functionality
+   - Implement proper data collection that doesn't interfere with the metrics being measured
+
+5. Technical considerations:
+   - Use the Web Vitals JavaScript library or implement custom measurement following Google's methodologies
+   - Ensure accurate measurement in various browser environments
+   - Implement proper throttling simulation to test under various network conditions
+   - Consider using PerformanceObserver API for metric collection
+   - Handle single-page applications and dynamic content loading scenarios
+
+# Test Strategy:
+Testing for the Core Web Vitals analysis module will follow a multi-layered approach:
+
+1. Unit testing:
+   - Create unit tests for each metric calculation function using Jest or similar testing framework
+   - Verify correct measurement algorithms for LCP, FID, and CLS independently
+   - Test element identification logic with mock DOM structures
+   - Validate recommendation engine rules with predefined test cases
+
+2. Integration testing:
+   - Test integration with the bookmarklet core structure (Task #1)
+   - Verify proper extension of the performance analysis module (Task #7)
+   - Ensure data flow between components works as expected
+
+3. Controlled environment testing:
+   - Create a set of test pages with known Core Web Vitals issues
+   - Verify the module correctly identifies and measures these issues
+   - Compare results against Chrome DevTools Lighthouse and PageSpeed Insights
+
+4. Cross-browser testing:
+   - Test in Chrome, Firefox, Safari, and Edge
+   - Verify consistent measurements across browsers
+   - Address any browser-specific implementation differences
+
+5. Real-world testing:
+   - Test against a diverse set of production websites with varying performance characteristics
+   - Compare results against Google's official Core Web Vitals measurement tools
+   - Validate accuracy within 10% margin of error compared to official tools
+
+6. Performance impact testing:
+   - Ensure the measurement code itself doesn't significantly impact the metrics being measured
+   - Verify the module has minimal performance overhead
+
+7. Acceptance criteria:
+   - Module accurately measures LCP, FID, and CLS within 10% of Google's official tools
+   - Successfully identifies elements contributing to poor scores
+   - Provides actionable, specific recommendations for improvement
+   - Functions correctly across all major browsers
+   - Integrates seamlessly with existing bookmarklet infrastructure
+
+# Subtasks:
+## 1. Implement Core Web Vitals Metrics Collection [done]
+### Dependencies: None
+### Description: Develop the foundational metrics collection system for LCP, FID, and CLS using the Web Vitals library and PerformanceObserver API.
+### Details:
+Integrate the web-vitals library or implement custom collection mechanisms following Google's methodologies. Use PerformanceObserver to track LCP elements, register event listeners for FID measurement, and implement layout shift calculation for CLS. Ensure the collection system works in various browsers and doesn't interfere with the metrics being measured. Include throttling simulation capabilities to test under various network conditions.
+
+## 2. Develop Element Identification and Attribution System [done]
+### Dependencies: 13.1
+### Description: Create algorithms to identify and attribute specific DOM elements that contribute to poor Core Web Vitals scores.
+### Details:
+Implement element tracking to identify the largest contentful paint element, elements causing layout shifts, and components contributing to input delay. Create DOM traversal utilities to map metrics to specific page elements. Develop a visual highlighting system using CSS overlays to pinpoint problematic elements directly on the analyzed page. Include element metadata collection (size, position, timing) for detailed analysis.
+
+## 3. Build Recommendation Engine for Core Web Vitals Optimization [done]
+### Dependencies: 13.1, 13.2
+### Description: Develop a rule-based system that generates specific optimization recommendations based on detected Core Web Vitals issues.
+### Details:
+Create a comprehensive rule set for common Core Web Vitals issues (e.g., unoptimized images for LCP, non-passive event listeners for FID, layout shifts from unspecified dimensions). Implement logic to categorize recommendations by impact level (high/medium/low) and implementation difficulty. Generate specific technical guidance including code snippets where applicable. Design the recommendation format to be actionable and clear.
+
+## 4. Integrate with Bookmarklet Core and Performance Module [done]
+### Dependencies: 13.1, 13.2, 13.3
+### Description: Connect the Core Web Vitals analysis module with the existing bookmarklet core structure and extend the performance analysis module.
+### Details:
+Implement the module interface according to the bookmarklet core structure from Task #1. Extend the performance analysis module from Task #7 with Core Web Vitals specific functionality. Create proper data flow between modules, ensuring the Core Web Vitals data is accessible to other components. Implement appropriate UI hooks for displaying results within the existing interface. Handle initialization and cleanup processes properly.
+
+## 5. Implement Special Case Handling and Final Optimization [done]
+### Dependencies: 13.1, 13.2, 13.3, 13.4
+### Description: Add support for edge cases such as single-page applications, dynamic content loading, and implement final optimizations for the module.
+### Details:
+Enhance the module to properly handle single-page applications by monitoring navigation events and route changes. Implement detection and measurement for dynamically loaded content. Add support for monitoring Core Web Vitals after user interactions that trigger significant page changes. Optimize the module's own performance to minimize impact on the page being analyzed. Implement proper error handling and fallback mechanisms for unsupported browsers or edge cases.
+

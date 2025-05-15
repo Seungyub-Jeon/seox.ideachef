@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>보안 분석 테스트</title>
+    <style>
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .container {
+            margin-bottom: 2rem;
+            border: 1px solid #eee;
+            padding: 1rem;
+            border-radius: 5px;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        .result-container {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .score-category {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        .score-bar {
+            flex-grow: 1;
+            height: 20px;
+            background-color: #eee;
+            margin: 0 10px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .score-value {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        .issues-container {
+            margin-top: 1rem;
+        }
+        .issue {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+        }
+        .issue.critical {
+            background-color: #ffebee;
+        }
+        .issue.major {
+            background-color: #fff8e1;
+        }
+        .issue.minor {
+            background-color: #e8f5e9;
+        }
+        .issue.info {
+            background-color: #e3f2fd;
+        }
+        button {
+            padding: 0.5rem 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        .tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>보안 분석 테스트</h1>
+        <p>보안 분석 모듈 테스트 페이지입니다.</p>
+    </header>
+
+    <div class="container">
+        <h2>분석 도구</h2>
+        <button id="runAnalysis">보안 분석 실행</button>
+        
+        <div class="result-container" id="result">
+            <p>분석 버튼을 클릭하여 테스트를 시작하세요.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>보안 테스트 요소</h2>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="https">HTTPS</div>
+            <div class="tab" data-tab="contentSecurity">Content Security</div>
+            <div class="tab" data-tab="forms">Forms</div>
+            <div class="tab" data-tab="links">External Links</div>
+            <div class="tab" data-tab="csp">CSP 분석</div>
+            <div class="tab" data-tab="injection">삽입 취약점</div>
+            <div class="tab" data-tab="auth">인증/세션</div>
+            <div class="tab" data-tab="sensitive">민감 정보</div>
+            <div class="tab" data-tab="thirdparty">외부 스크립트</div>
+        </div>
+
+        <div class="tab-content active" id="https">
+            <h3>HTTPS 및 혼합 콘텐츠</h3>
+            <p>이 섹션은 HTTPS 프로토콜 사용 및 혼합 콘텐츠 문제를 테스트합니다.</p>
+            
+            <div>
+                <p>현재 프로토콜: <span id="currentProtocol"></span></p>
+                <p>HTTPS 사용 중: <span id="isHttps"></span></p>
+            </div>
+            
+            <h4>혼합 콘텐츠 시뮬레이션</h4>
+            <div id="mixedContentDemo">
+                <!-- 이 부분에 HTTP 리소스 로드 버튼 추가 -->
+                <button id="loadMixedContent">혼합 콘텐츠 로드 (시뮬레이션)</button>
+                <div id="mixedContentResult"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="contentSecurity">
+            <h3>Content Security Policy</h3>
+            <p>이 섹션은 Content Security Policy(CSP) 설정을 테스트합니다.</p>
+            
+            <h4>CSP 메타 태그 테스트</h4>
+            <div>
+                <input type="radio" name="csp" id="cspNone" checked>
+                <label for="cspNone">CSP 없음</label><br>
+                
+                <input type="radio" name="csp" id="cspStrict">
+                <label for="cspStrict">엄격한 CSP (default-src 'self')</label><br>
+                
+                <input type="radio" name="csp" id="cspUnsafe">
+                <label for="cspUnsafe">안전하지 않은 CSP (unsafe-inline 포함)</label><br>
+                
+                <input type="radio" name="csp" id="cspWildcard">
+                <label for="cspWildcard">와일드카드 CSP (script-src *)</label><br>
+                
+                <button id="applyCsp">CSP 적용</button>
+            </div>
+            
+            <h4>인라인 스크립트 테스트</h4>
+            <button onclick="alert('인라인 이벤트 핸들러 테스트')">인라인 이벤트 핸들러</button>
+            
+            <script>
+                // 인라인 스크립트 예시
+                console.log('인라인 스크립트 테스트');
+            </script>
+        </div>
+
+        <div class="tab-content" id="forms">
+            <h3>폼 보안</h3>
+            <p>이 섹션은 폼 보안 설정을 테스트합니다.</p>
+            
+            <h4>GET 메서드 폼 (민감한 데이터)</h4>
+            <form method="GET" action="#" id="getForm">
+                <div>
+                    <label for="username">사용자명:</label>
+                    <input type="text" id="username" name="username">
+                </div>
+                <div>
+                    <label for="password">비밀번호:</label>
+                    <input type="password" id="password" name="password">
+                </div>
+                <button type="submit">제출 (GET)</button>
+            </form>
+            
+            <h4>POST 메서드 폼 (CSRF 토큰 없음)</h4>
+            <form method="POST" action="#" id="postForm">
+                <div>
+                    <label for="email">이메일:</label>
+                    <input type="email" id="email" name="email">
+                </div>
+                <div>
+                    <label for="message">메시지:</label>
+                    <textarea id="message" name="message"></textarea>
+                </div>
+                <button type="submit">제출 (POST, CSRF 토큰 없음)</button>
+            </form>
+            
+            <h4>안전한 폼 (POST + CSRF)</h4>
+            <form method="POST" action="#" id="secureForm" autocomplete="off">
+                <div>
+                    <label for="secure_username">사용자명:</label>
+                    <input type="text" id="secure_username" name="secure_username">
+                </div>
+                <div>
+                    <label for="secure_password">비밀번호:</label>
+                    <input type="password" id="secure_password" name="secure_password" autocomplete="off">
+                </div>
+                <input type="hidden" name="_csrf_token" value="fake-csrf-token-123">
+                <button type="submit">제출 (안전한 폼)</button>
+            </form>
+        </div>
+
+        <div class="tab-content" id="links">
+            <h3>외부 링크 보안</h3>
+            <p>이 섹션은 외부 링크 및 iframe 보안을 테스트합니다.</p>
+            
+            <h4>다양한 외부 링크</h4>
+            <ul>
+                <li><a href="https://example.com" target="_blank">안전하지 않은 새 창 링크 (noopener/noreferrer 없음)</a></li>
+                <li><a href="https://example.com" target="_blank" rel="noopener noreferrer">안전한 새 창 링크 (noopener/noreferrer 있음)</a></li>
+                <li><a href="http://example.com">HTTP 링크</a></li>
+                <li><a href="https://example.com">HTTPS 링크</a></li>
+            </ul>
+            
+            <h4>iframe 보안</h4>
+            <div>
+                <p>sandbox 속성이 없는 iframe:</p>
+                <iframe src="about:blank" width="300" height="100"></iframe>
+                
+                <p>sandbox 속성이 있는 iframe:</p>
+                <iframe src="about:blank" sandbox="allow-scripts" width="300" height="100"></iframe>
+            </div>
+        </div>
+
+        <div class="tab-content" id="csp">
+            <h3>Content Security Policy 심층 분석</h3>
+            <p>이 섹션은 향상된 CSP 분석 모듈을 테스트합니다.</p>
+            
+            <h4>CSP 설정</h4>
+            <textarea id="cspInput" rows="4" cols="50">default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';</textarea>
+            <br>
+            <button id="analyzeCSP">CSP 분석하기</button>
+            
+            <div id="cspResult" class="result-container">
+                <p>CSP 분석 결과가 여기에 표시됩니다.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="injection">
+            <h3>삽입 취약점 감지</h3>
+            <p>이 섹션은 XSS, SQL 인젝션, CSRF 취약점 감지를 테스트합니다.</p>
+            
+            <h4>XSS 테스트</h4>
+            <div id="xssTest">
+                <input type="text" id="xssInput" placeholder="스크립트 입력 (예: <script>alert('XSS')</script>)">
+                <button id="testXSS">XSS 테스트</button>
+                <div id="xssOutput"></div>
+            </div>
+            
+            <h4>SQL 인젝션 테스트</h4>
+            <div id="sqlTest">
+                <input type="text" id="sqlInput" placeholder="SQL 인젝션 입력 (예: ' OR 1=1 --)">
+                <button id="testSQL">SQL 인젝션 테스트</button>
+                <div id="sqlOutput"></div>
+            </div>
+            
+            <div id="injectionResult" class="result-container">
+                <p>삽입 취약점 분석 결과가 여기에 표시됩니다.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="auth">
+            <h3>인증 및 세션 보안</h3>
+            <p>이 섹션은 인증 및 세션 보안을 테스트합니다.</p>
+            
+            <h4>인증 폼 테스트</h4>
+            <form id="authTestForm">
+                <div>
+                    <label for="auth_username">사용자명:</label>
+                    <input type="text" id="auth_username" name="auth_username">
+                </div>
+                <div>
+                    <label for="auth_password">비밀번호:</label>
+                    <input type="password" id="auth_password" name="auth_password">
+                </div>
+                <button type="button" id="testAuth">인증 폼 테스트</button>
+            </form>
+            
+            <h4>쿠키 테스트</h4>
+            <button id="testCookies">쿠키 보안 테스트</button>
+            
+            <div id="authResult" class="result-container">
+                <p>인증 및 세션 보안 분석 결과가 여기에 표시됩니다.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="sensitive">
+            <h3>민감한 정보 감지</h3>
+            <p>이 섹션은 민감한 정보 감지를 테스트합니다.</p>
+            
+            <h4>API 키 테스트</h4>
+            <div id="apiKeyTest">
+                <textarea id="sensitiveContent" rows="4" cols="50">// API 키 예시
+const API_KEY = "abcdef12345-apikey-test";
+const AWS_SECRET = "AKIAIOSFODNN7EXAMPLE";
+// 민감한 정보 없음
+const userName = "john_doe";</textarea>
+                <br>
+                <button id="testSensitiveData">민감한 정보 스캔</button>
+            </div>
+            
+            <h4>웹 스토리지 테스트</h4>
+            <button id="testWebStorage">웹 스토리지 테스트</button>
+            
+            <div id="sensitiveResult" class="result-container">
+                <p>민감한 정보 스캔 결과가 여기에 표시됩니다.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="thirdparty">
+            <h3>서드파티 스크립트 보안</h3>
+            <p>이 섹션은 서드파티 스크립트 보안 분석을 테스트합니다.</p>
+            
+            <h4>외부 스크립트 테스트</h4>
+            <div id="scriptTest">
+                <button id="addExternalScript">외부 스크립트 추가</button>
+                <button id="addUnsafeScript">안전하지 않은 스크립트 추가</button>
+                <div id="scriptList"></div>
+            </div>
+            
+            <h4>SRI(Subresource Integrity) 테스트</h4>
+            <button id="testSRI">SRI 테스트</button>
+            
+            <div id="thirdpartyResult" class="result-container">
+                <p>서드파티 스크립트 보안 분석 결과가 여기에 표시됩니다.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 코어 JS 파일 로드 -->
+    <script src="assets/js/core.js"></script>
+    
+    <!-- 유틸리티 JS 파일 로드 -->
+    <script src="assets/js/utils/analyzer.js"></script>
+    <script src="assets/js/utils/parser.js"></script>
+    <script src="assets/js/utils/observer.js"></script>
+    <script src="assets/js/utils/loader.js"></script>
+    
+    <!-- 보안 분석 모듈 로드 -->
+    <script src="assets/js/analyzer/security/csp-analyzer.js"></script>
+    <script src="assets/js/analyzer/security/injection-detector.js"></script>
+    <script src="assets/js/analyzer/security/auth-session-validator.js"></script>
+    <script src="assets/js/analyzer/security/sensitive-data-scanner.js"></script>
+    <script src="assets/js/analyzer/security/thirdparty-script-analyzer.js"></script>
+    <script src="assets/js/analyzer/security/index.js"></script>
+    
+    <script>
+        // DOM 로드 후 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            // 네임스페이스 확인
+            if (!window.KoreanWebAnalyzer) {
+                window.KoreanWebAnalyzer = {
+                    logger: console,
+                    utils: {
+                        analyzer: {
+                            createIssue: function(type, severity, message, details, element, solution) {
+                                return {
+                                    type: type,
+                                    severity: severity,
+                                    message: message,
+                                    details: details,
+                                    element: element,
+                                    solution: solution
+                                };
+                            }
+                        }
+                    },
+                    analyzer: {}
+                };
+            }
+            
+            // 탭 기능
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // 탭 활성화
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 탭 콘텐츠 활성화
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // 현재 프로토콜 표시
+            document.getElementById('currentProtocol').textContent = window.location.protocol;
+            document.getElementById('isHttps').textContent = window.location.protocol === 'https:' ? '예' : '아니오';
+            
+            // 혼합 콘텐츠 시뮬레이션
+            document.getElementById('loadMixedContent').addEventListener('click', function() {
+                const resultDiv = document.getElementById('mixedContentResult');
+                resultDiv.innerHTML = '<p>혼합 콘텐츠 로드 시뮬레이션 중...</p>';
+                
+                // 실제로 HTTP 이미지를 로드하지 않고 시뮬레이션만 합니다
+                setTimeout(() => {
+                    resultDiv.innerHTML = `
+                        <div style="border: 1px solid #ffcccc; padding: 10px; margin-top: 10px; border-radius: 5px;">
+                            <p>시뮬레이션된 혼합 콘텐츠:</p>
+                            <ul>
+                                <li>http://example.com/image.jpg (이미지)</li>
+                                <li>http://example.com/script.js (스크립트)</li>
+                            </ul>
+                            <p>참고: 실제 리소스는 로드되지 않았습니다. 이것은 시뮬레이션입니다.</p>
+                        </div>
+                    `;
+                }, 1000);
+            });
+            
+            // CSP 적용
+            document.getElementById('applyCsp').addEventListener('click', function() {
+                // 기존 CSP 메타 태그 제거
+                const existingCspTag = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+                if (existingCspTag) {
+                    existingCspTag.remove();
+                }
+                
+                // 선택된 CSP 옵션 확인
+                let cspValue = '';
+                
+                if (document.getElementById('cspStrict').checked) {
+                    cspValue = "default-src 'self'";
+                } else if (document.getElementById('cspUnsafe').checked) {
+                    cspValue = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'";
+                } else if (document.getElementById('cspWildcard').checked) {
+                    cspValue = "default-src 'self'; script-src *; style-src *";
+                }
+                
+                // CSP 메타 태그 추가
+                if (cspValue) {
+                    const metaTag = document.createElement('meta');
+                    metaTag.setAttribute('http-equiv', 'Content-Security-Policy');
+                    metaTag.setAttribute('content', cspValue);
+                    document.head.appendChild(metaTag);
+                    
+                    alert(`CSP가 설정되었습니다: ${cspValue}`);
+                } else {
+                    alert('CSP가 제거되었습니다.');
+                }
+            });
+            
+            // 폼 기본 동작 방지
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('폼 제출이 방지되었습니다 (테스트용)');
+                });
+            });
+            
+            // 분석 실행
+            document.getElementById('runAnalysis').addEventListener('click', runSecurityAnalysis);
+            
+            // 보안 분석 실행
+            function runSecurityAnalysis() {
+                const resultContainer = document.getElementById('result');
+                resultContainer.innerHTML = '<p>보안 분석 중입니다...</p>';
+                
+                try {
+                    if (window.KoreanWebAnalyzer.analyzer.security) {
+                        const results = window.KoreanWebAnalyzer.analyzer.security.analyze(document);
+                        displayResults(results);
+                    } else {
+                        resultContainer.innerHTML = '<p>보안 분석 모듈을 찾을 수 없습니다.</p>';
+                    }
+                } catch (error) {
+                    resultContainer.innerHTML = `<p>오류 발생: ${error.message}</p>`;
+                    console.error('보안 분석 중 오류 발생:', error);
+                }
+            }
+            
+            // 결과 표시
+            function displayResults(results) {
+                const resultContainer = document.getElementById('result');
+                
+                // HTML 생성
+                let html = `<div class="score">보안 점수: ${results.score}/100</div>`;
+                
+                // 카테고리별 점수
+                for (const category in results.details) {
+                    html += `<div class="score-category">${category}: `;
+                    html += `<div class="score-bar"><div class="score-value" style="width: ${results.details[category].score}%;"></div></div>`;
+                    html += `${results.details[category].score}/100</div>`;
+                }
+                
+                // 이슈 표시
+                html += '<h3>보안 이슈</h3>';
+                html += '<div class="issues-container">';
+                
+                for (const category in results.details) {
+                    if (results.details[category].issues) {
+                        results.details[category].issues.forEach(issue => {
+                            html += `<div class="issue ${issue.severity}">`;
+                            html += `<strong>[${category}] ${issue.message}</strong><br>`;
+                            html += `${issue.details}<br>`;
+                            if (issue.solution) {
+                                html += `<em>해결 방법: ${issue.solution}</em>`;
+                            }
+                            html += '</div>';
+                        });
+                    }
+                }
+                
+                html += '</div>';
+                
+                resultContainer.innerHTML = html;
+                
+                // 점수 바 애니메이션
+                setTimeout(() => {
+                    const scoreValues = document.querySelectorAll('.score-value');
+                    scoreValues.forEach(value => {
+                        const width = value.style.width;
+                        value.style.width = '0%';
+                        setTimeout(() => {
+                            value.style.width = width;
+                        }, 100);
+                    });
+                }, 100);
+            }
+
+            // 향상된 보안 모듈 테스트 기능 추가
+            // CSP 분석 테스트
+            document.getElementById('analyzeCSP').addEventListener('click', function() {
+                const cspValue = document.getElementById('cspInput').value;
+                const metaTag = document.createElement('meta');
+                metaTag.setAttribute('http-equiv', 'Content-Security-Policy');
+                metaTag.setAttribute('content', cspValue);
+                
+                // 기존 CSP 메타 태그 제거
+                const existingCspTag = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+                if (existingCspTag) {
+                    existingCspTag.remove();
+                }
+                
+                // 새 CSP 메타 태그 추가
+                document.head.appendChild(metaTag);
+                
+                try {
+                    if (window.KoreanWebAnalyzer.analyzer.security.CSPAnalyzer) {
+                        const results = window.KoreanWebAnalyzer.analyzer.security.CSPAnalyzer.analyze(document);
+                        displayCSPResults(results);
+                    } else {
+                        document.getElementById('cspResult').innerHTML = '<p>CSP 분석 모듈을 찾을 수 없습니다.</p>';
+                    }
+                } catch (error) {
+                    document.getElementById('cspResult').innerHTML = `<p>오류 발생: ${error.message}</p>`;
+                    console.error('CSP 분석 중 오류 발생:', error);
+                }
+            });
+            
+            function displayCSPResults(results) {
+                const container = document.getElementById('cspResult');
+                
+                let html = `<div class="score">CSP 보안 점수: ${results.score}/100</div>`;
+                
+                // CSP 지시문 표시
+                if (results.directives && Object.keys(results.directives).length > 0) {
+                    html += '<h4>감지된 CSP 지시문</h4>';
+                    html += '<ul>';
+                    for (const [directive, values] of Object.entries(results.directives)) {
+                        html += `<li><strong>${directive}:</strong> ${values.join(' ')}</li>`;
+                    }
+                    html += '</ul>';
+                }
+                
+                // 이슈 표시
+                if (results.issues && results.issues.length > 0) {
+                    html += '<h4>CSP 이슈</h4>';
+                    html += '<div class="issues-container">';
+                    results.issues.forEach(issue => {
+                        html += `<div class="issue ${issue.severity}">`;
+                        html += `<strong>${issue.message}</strong><br>`;
+                        html += `${issue.details}<br>`;
+                        if (issue.solution) {
+                            html += `<em>해결 방법: ${issue.solution}</em>`;
+                        }
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                }
+                
+                // 권장사항 표시
+                if (results.recommendations && results.recommendations.length > 0) {
+                    html += '<h4>CSP 개선 권장사항</h4>';
+                    results.recommendations.forEach(rec => {
+                        html += `<div class="recommendation">`;
+                        html += `<strong>${rec.title}</strong><br>`;
+                        html += `${rec.description}<br>`;
+                        if (rec.implementation) {
+                            html += `<details><summary>구현 방법</summary>${rec.implementation}</details>`;
+                        }
+                        html += '</div>';
+                    });
+                }
+                
+                container.innerHTML = html;
+            }
+            
+            // 인젝션 취약점 테스트
+            document.getElementById('testXSS').addEventListener('click', function() {
+                const xssInput = document.getElementById('xssInput').value;
+                const outputDiv = document.getElementById('xssOutput');
+                
+                // 실제로 XSS를 실행하지 않고 문자열만 표시 (안전한 테스트)
+                outputDiv.textContent = `입력된 값: ${xssInput}`;
+                
+                try {
+                    if (window.KoreanWebAnalyzer.analyzer.security.InjectionDetector) {
+                        const results = window.KoreanWebAnalyzer.analyzer.security.InjectionDetector.analyze(document);
+                        displayInjectionResults(results);
+                    } else {
+                        document.getElementById('injectionResult').innerHTML = '<p>인젝션 취약점 감지 모듈을 찾을 수 없습니다.</p>';
+                    }
+                } catch (error) {
+                    document.getElementById('injectionResult').innerHTML = `<p>오류 발생: ${error.message}</p>`;
+                    console.error('인젝션 취약점 감지 중 오류 발생:', error);
+                }
+            });
+            
+            document.getElementById('testSQL').addEventListener('click', function() {
+                const sqlInput = document.getElementById('sqlInput').value;
+                const outputDiv = document.getElementById('sqlOutput');
+                
+                // SQL 인젝션 패턴 감지 (시뮬레이션)
+                if (sqlInput.toLowerCase().includes("' or") || sqlInput.toLowerCase().includes("--")) {
+                    outputDiv.innerHTML = `<span style="color: red;">SQL 인젝션 패턴 감지됨: ${sqlInput}</span>`;
+                } else {
+                    outputDiv.textContent = `입력된 값: ${sqlInput}`;
+                }
+                
+                // 인젝션 감지 모듈 실행
+                document.getElementById('testXSS').click();
+            });
+            
+            function displayInjectionResults(results) {
+                const container = document.getElementById('injectionResult');
+                
+                let html = `<div class="score">인젝션 보안 점수: ${results.score}/100</div>`;
+                
+                // 통계 정보 표시
+                if (results.stats) {
+                    html += '<h4>감지 통계</h4>';
+                    html += '<ul>';
+                    for (const [key, value] of Object.entries(results.stats)) {
+                        html += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    html += '</ul>';
+                }
+                
+                // 이슈 표시
+                if (results.issues && results.issues.length > 0) {
+                    html += '<h4>감지된 취약점</h4>';
+                    html += '<div class="issues-container">';
+                    results.issues.forEach(issue => {
+                        html += `<div class="issue ${issue.severity}">`;
+                        html += `<strong>${issue.message}</strong><br>`;
+                        html += `${issue.details}<br>`;
+                        if (issue.solution) {
+                            html += `<em>해결 방법: ${issue.solution}</em>`;
+                        }
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                }
+                
+                // 권장사항 표시
+                if (results.recommendations && results.recommendations.length > 0) {
+                    html += '<h4>보안 개선 권장사항</h4>';
+                    results.recommendations.forEach(rec => {
+                        html += `<div class="recommendation">`;
+                        html += `<strong>${rec.title}</strong><br>`;
+                        html += `${rec.description}<br>`;
+                        if (rec.implementation) {
+                            html += `<details><summary>구현 방법</summary>${rec.implementation}</details>`;
+                        }
+                        html += '</div>';
+                    });
+                }
+                
+                container.innerHTML = html;
+            }
+            
+            // 인증 및 세션 보안 테스트
+            document.getElementById('testAuth').addEventListener('click', function() {
+                try {
+                    // 테스트용 쿠키 설정
+                    document.cookie = "testSession=12345; path=/";
+                    document.cookie = "secureSession=67890; path=/; secure";
+                    
+                    if (window.KoreanWebAnalyzer.analyzer.security.AuthSessionValidator) {
+                        const results = window.KoreanWebAnalyzer.analyzer.security.AuthSessionValidator.analyze(document);
+                        displayAuthResults(results);
+                    } else {
+                        document.getElementById('authResult').innerHTML = '<p>인증 및 세션 보안 분석 모듈을 찾을 수 없습니다.</p>';
+                    }
+                } catch (error) {
+                    document.getElementById('authResult').innerHTML = `<p>오류 발생: ${error.message}</p>`;
+                    console.error('인증 및 세션 보안 분석 중 오류 발생:', error);
+                }
+            });
+            
+            document.getElementById('testCookies').addEventListener('click', function() {
+                // 다양한 쿠키 설정 (테스트용)
+                document.cookie = "regularCookie=value; path=/";
+                document.cookie = "secureCookie=value; path=/; secure";
+                document.cookie = "httpOnlyCookie=value; path=/; HttpOnly";
+                document.cookie = "sameSiteCookie=value; path=/; SameSite=Strict";
+                
+                // 인증 테스트 실행
+                document.getElementById('testAuth').click();
+            });
+            
+            function displayAuthResults(results) {
+                const container = document.getElementById('authResult');
+                
+                let html = `<div class="score">인증 보안 점수: ${results.score}/100</div>`;
+                
+                // 통계 정보 표시
+                if (results.stats) {
+                    html += '<h4>인증 및 세션 통계</h4>';
+                    html += '<ul>';
+                    for (const [key, value] of Object.entries(results.stats)) {
+                        html += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    html += '</ul>';
+                }
+                
+                // 이슈 표시
+                if (results.issues && results.issues.length > 0) {
+                    html += '<h4>감지된 보안 이슈</h4>';
+                    html += '<div class="issues-container">';
+                    results.issues.forEach(issue => {
+                        html += `<div class="issue ${issue.severity}">`;
+                        html += `<strong>${issue.message}</strong><br>`;
+                        html += `${issue.details}<br>`;
+                        if (issue.solution) {
+                            html += `<em>해결 방법: ${issue.solution}</em>`;
+                        }
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                }
+                
+                // 권장사항 표시
+                if (results.recommendations && results.recommendations.length > 0) {
+                    html += '<h4>보안 개선 권장사항</h4>';
+                    results.recommendations.forEach(rec => {
+                        html += `<div class="recommendation">`;
+                        html += `<strong>${rec.title}</strong><br>`;
+                        html += `${rec.description}<br>`;
+                        if (rec.implementation) {
+                            html += `<details><summary>구현 방법</summary>${rec.implementation}</details>`;
+                        }
+                        html += '</div>';
+                    });
+                }
+                
+                container.innerHTML = html;
+            }
+            
+            // 민감한 정보 테스트
+            document.getElementById('testSensitiveData').addEventListener('click', function() {
+                try {
+                    if (window.KoreanWebAnalyzer.analyzer.security.SensitiveDataScanner) {
+                        const results = window.KoreanWebAnalyzer.analyzer.security.SensitiveDataScanner.analyze(document);
+                        displaySensitiveResults(results);
+                    } else {
+                        document.getElementById('sensitiveResult').innerHTML = '<p>민감한 정보 스캐너 모듈을 찾을 수 없습니다.</p>';
+                    }
+                } catch (error) {
+                    document.getElementById('sensitiveResult').innerHTML = `<p>오류 발생: ${error.message}</p>`;
+                    console.error('민감한 정보 스캔 중 오류 발생:', error);
+                }
+            });
+            
+            document.getElementById('testWebStorage').addEventListener('click', function() {
+                // 테스트용 웹 스토리지 설정
+                localStorage.setItem('apiKey', 'testApiKey12345');
+                localStorage.setItem('userEmail', 'user@example.com');
+                localStorage.setItem('regularData', 'this is not sensitive');
+                
+                sessionStorage.setItem('sessionToken', 'abcdef123456');
+                sessionStorage.setItem('creditCard', '1234-5678-9012-3456');
+                
+                // 민감한 정보 스캔 실행
+                document.getElementById('testSensitiveData').click();
+            });
+            
+            function displaySensitiveResults(results) {
+                const container = document.getElementById('sensitiveResult');
+                
+                let html = `<div class="score">민감한 정보 보안 점수: ${results.score}/100</div>`;
+                
+                // 통계 정보 표시
+                if (results.stats) {
+                    html += '<h4>감지 통계</h4>';
+                    html += '<ul>';
+                    for (const [key, value] of Object.entries(results.stats)) {
+                        html += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    html += '</ul>';
+                }
+                
+                // 이슈 표시
+                if (results.issues && results.issues.length > 0) {
+                    html += '<h4>감지된 민감한 정보</h4>';
+                    html += '<div class="issues-container">';
+                    results.issues.forEach(issue => {
+                        html += `<div class="issue ${issue.severity}">`;
+                        html += `<strong>${issue.message}</strong><br>`;
+                        html += `${issue.details}<br>`;
+                        if (issue.solution) {
+                            html += `<em>해결 방법: ${issue.solution}</em>`;
+                        }
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                }
+                
+                // 권장사항 표시
+                if (results.recommendations && results.recommendations.length > 0) {
+                    html += '<h4>보안 개선 권장사항</h4>';
+                    results.recommendations.forEach(rec => {
+                        html += `<div class="recommendation">`;
+                        html += `<strong>${rec.title}</strong><br>`;
+                        html += `${rec.description}<br>`;
+                        if (rec.implementation) {
+                            html += `<details><summary>구현 방법</summary>${rec.implementation}</details>`;
+                        }
+                        html += '</div>';
+                    });
+                }
+                
+                container.innerHTML = html;
+            }
+            
+            // 서드파티 스크립트 테스트
+            document.getElementById('addExternalScript').addEventListener('click', function() {
+                // 안전한 외부 스크립트 추가
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js';
+                script.integrity = 'sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==';
+                script.crossOrigin = 'anonymous';
+                document.body.appendChild(script);
+                
+                const scriptList = document.getElementById('scriptList');
+                scriptList.innerHTML += `<div>안전한 스크립트 추가됨: jQuery 3.6.0 (SRI 포함)</div>`;
+                
+                setTimeout(() => {
+                    document.getElementById('testSRI').click();
+                }, 500);
+            });
+            
+            document.getElementById('addUnsafeScript').addEventListener('click', function() {
+                // 안전하지 않은 외부 스크립트 추가 (SRI 없음, 취약한 버전)
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js';
+                document.body.appendChild(script);
+                
+                const scriptList = document.getElementById('scriptList');
+                scriptList.innerHTML += `<div>안전하지 않은 스크립트 추가됨: jQuery 1.12.4 (SRI 없음, 취약 버전)</div>`;
+                
+                setTimeout(() => {
+                    document.getElementById('testSRI').click();
+                }, 500);
+            });
+            
+            document.getElementById('testSRI').addEventListener('click', function() {
+                try {
+                    if (window.KoreanWebAnalyzer.analyzer.security.ThirdpartyScriptAnalyzer) {
+                        const results = window.KoreanWebAnalyzer.analyzer.security.ThirdpartyScriptAnalyzer.analyze(document);
+                        displayThirdpartyResults(results);
+                    } else {
+                        document.getElementById('thirdpartyResult').innerHTML = '<p>서드파티 스크립트 분석 모듈을 찾을 수 없습니다.</p>';
+                    }
+                } catch (error) {
+                    document.getElementById('thirdpartyResult').innerHTML = `<p>오류 발생: ${error.message}</p>`;
+                    console.error('서드파티 스크립트 분석 중 오류 발생:', error);
+                }
+            });
+            
+            function displayThirdpartyResults(results) {
+                const container = document.getElementById('thirdpartyResult');
+                
+                let html = `<div class="score">외부 스크립트 보안 점수: ${results.score}/100</div>`;
+                
+                // 통계 정보 표시
+                if (results.stats) {
+                    html += '<h4>스크립트 통계</h4>';
+                    html += '<ul>';
+                    for (const [key, value] of Object.entries(results.stats)) {
+                        html += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    html += '</ul>';
+                }
+                
+                // 이슈 표시
+                if (results.issues && results.issues.length > 0) {
+                    html += '<h4>감지된 스크립트 보안 이슈</h4>';
+                    html += '<div class="issues-container">';
+                    results.issues.forEach(issue => {
+                        html += `<div class="issue ${issue.severity}">`;
+                        html += `<strong>${issue.message}</strong><br>`;
+                        html += `${issue.details}<br>`;
+                        if (issue.solution) {
+                            html += `<em>해결 방법: ${issue.solution}</em>`;
+                        }
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                }
+                
+                // 권장사항 표시
+                if (results.recommendations && results.recommendations.length > 0) {
+                    html += '<h4>보안 개선 권장사항</h4>';
+                    results.recommendations.forEach(rec => {
+                        html += `<div class="recommendation">`;
+                        html += `<strong>${rec.title}</strong><br>`;
+                        html += `${rec.description}<br>`;
+                        if (rec.implementation) {
+                            html += `<details><summary>구현 방법</summary>${rec.implementation}</details>`;
+                        }
+                        html += '</div>';
+                    });
+                }
+                
+                container.innerHTML = html;
+            }
+        });
+    </script>
+</body>
+</html>

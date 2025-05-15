@@ -1,0 +1,191 @@
+/* 구조화 데이터 분석 차트 스타일 */
+.structured-data-chart {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 점수 차트 */
+.score-chart {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+}
+
+.score-chart-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #e9e9e9;
+}
+
+.score-chart-fill {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    clip: rect(0, 120px, 120px, 60px);
+    background-color: #4CAF50;
+    transform: rotate(0deg);
+    transition: transform 1s ease-in-out;
+}
+
+.score-chart-fill.low {
+    background-color: #F44336;
+}
+
+.score-chart-fill.medium {
+    background-color: #FFC107;
+}
+
+.score-chart-fill.high {
+    background-color: #4CAF50;
+}
+
+.score-chart-center {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    top: 20px;
+    left: 20px;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* 막대 차트 */
+.bar-chart {
+    margin: 20px 0;
+}
+
+.bar-chart-container {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.bar-chart-item {
+    margin-bottom: 12px;
+}
+
+.bar-chart-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.bar-chart-label-text {
+    font-weight: 500;
+}
+
+.bar-chart-bar-container {
+    height: 12px;
+    width: 100%;
+    background-color: #e9e9e9;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.bar-chart-bar {
+    height: 100%;
+    background-color: #4CAF50;
+    border-radius: 6px;
+    transition: width 0.8s ease-in-out;
+}
+
+.bar-chart-bar.jsonld {
+    background-color: #F44336;
+}
+
+.bar-chart-bar.microdata {
+    background-color: #2196F3;
+}
+
+.bar-chart-bar.rdfa {
+    background-color: #FF9800;
+}
+
+/* 파이 차트 */
+.pie-chart {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+    position: relative;
+    border-radius: 50%;
+}
+
+.pie-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.pie-chart-legend-item {
+    display: flex;
+    align-items: center;
+    margin: 0 10px 5px 0;
+}
+
+.pie-chart-legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    margin-right: 5px;
+}
+
+.pie-chart-legend-text {
+    font-size: 13px;
+}
+
+/* 레이더 차트 */
+.radar-chart {
+    width: 250px;
+    height: 250px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.radar-chart-axis {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.radar-chart-polygon {
+    fill: rgba(76, 175, 80, 0.2);
+    stroke: #4CAF50;
+    stroke-width: 2;
+}
+
+.radar-chart-circle {
+    fill: white;
+    stroke: #ddd;
+    stroke-width: 1;
+}
+
+.radar-chart-label {
+    font-size: 12px;
+    text-anchor: middle;
+}
+
+/* 애니메이션 */
+@keyframes fillChart {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(180deg); }
+}
+
+.chart-animate {
+    animation: fillChart 1s ease-out forwards;
+}

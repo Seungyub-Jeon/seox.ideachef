@@ -1,0 +1,96 @@
+# Task ID: 4
+# Title: 웹표준 검증 모듈 개발
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: HTML 유효성, 구조적 마크업, 시맨틱 태그 사용 등 웹표준 준수 여부를 분석하는 모듈 개발
+# Details:
+1. 웹표준 분석 클래스 구현:
+```javascript
+class StandardsAnalyzer {
+  constructor(document) {
+    this.doc = document;
+    this.results = {
+      htmlValidity: { score: 0, issues: [] },
+      semanticMarkup: { score: 0, issues: [] },
+      deprecatedElements: { score: 0, issues: [] },
+      doctype: { score: 0, issues: [] }
+    };
+  }
+
+  analyze() {
+    this.checkDoctype();
+    this.checkSemanticMarkup();
+    this.checkDeprecatedElements();
+    this.checkStructure();
+    return this.calculateScore();
+  }
+
+  checkDoctype() {
+    // DOCTYPE 선언 확인
+    const doctype = this.doc.doctype;
+    if (!doctype) {
+      this.results.doctype.issues.push({
+        severity: 'critical',
+        message: 'DOCTYPE 선언이 없습니다.'
+      });
+    }
+  }
+
+  // 기타 검증 메서드...
+
+  calculateScore() {
+    // 종합 점수 계산 로직
+    return {
+      score: 0, // 계산된 점수
+      results: this.results
+    };
+  }
+}
+```
+
+2. 주요 분석 항목:
+- HTML5 DOCTYPE 선언 확인
+- 시맨틱 태그 사용 (header, nav, main, section, article, footer 등)
+- 폐기된(deprecated) 요소 및 속성 사용 확인
+- 구조적 마크업 검증
+- 중첩 오류 확인
+- 속성 값 유효성 검증
+
+3. 클라이언트 측 HTML 유효성 검사 구현:
+- 주요 HTML 규칙 위반 사항 확인
+- 구조적 오류 감지
+
+4. 개선 제안 생성 로직 구현
+
+# Test Strategy:
+1. 다양한 웹표준 준수 수준의 웹사이트에서 분석 정확도 검증
+2. 일반적인 웹표준 위반 사항 감지 확인 (폐기된 태그, 속성 오류 등)
+3. 시맨틱 마크업 분석 정확도 테스트
+4. 클라이언트 측 유효성 검사의 한계 인식 및 명확한 안내 제공
+
+# Subtasks:
+## 1. HTML Validity Checker Component [done]
+### Dependencies: None
+### Description: Develop a component that validates HTML against W3C standards
+### Details:
+Create a module that parses HTML documents and checks for syntax errors, unclosed tags, invalid nesting, and other HTML validity issues according to W3C specifications. Implement error reporting with line numbers and suggested fixes.
+
+## 2. Semantic Markup Analyzer [done]
+### Dependencies: 4.1
+### Description: Build a component that evaluates proper usage of semantic HTML elements
+### Details:
+Develop an analyzer that checks for appropriate use of semantic elements like <header>, <nav>, <main>, <article>, <section>, <aside>, and <footer>. Verify that elements are used according to their intended semantic meaning and provide recommendations for improving document semantics.
+
+## 3. Deprecated Elements Detector [done]
+### Dependencies: 4.1
+### Description: Create a component that identifies deprecated HTML elements and attributes
+### Details:
+Implement a detector that scans HTML for deprecated or obsolete elements and attributes according to HTML5 specifications. Flag elements like <font>, <center>, and attributes like 'align', 'bgcolor', etc. Provide modern alternatives for each deprecated feature detected.
+
+## 4. Document Structure Validator [done]
+### Dependencies: 4.1, 4.2
+### Description: Develop a component that analyzes overall document structure and hierarchy
+### Details:
+Build a validator that examines document outline, heading hierarchy (h1-h6), landmark regions, and overall document structure. Check for proper nesting of elements, appropriate heading levels, and logical document flow. Generate a structural report with visualization of the document hierarchy.
+

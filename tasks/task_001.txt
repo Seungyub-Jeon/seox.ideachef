@@ -1,0 +1,65 @@
+# Task ID: 1
+# Title: 북마클릿 코어 구조 개발
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: 북마클릿의 기본 구조와 로더 스크립트를 구현하여 페이지 HTML을 수집하고 분석 엔진을 초기화하는 기능 개발
+# Details:
+1. 북마클릿 로더 스크립트 구현:
+```javascript
+javascript:(function(){
+  var script = document.createElement('script');
+  script.src = 'https://your-domain.com/assets/js/bookmarklet.min.js?v=' + new Date().getTime();
+  document.body.appendChild(script);
+})();
+```
+
+2. 메인 북마클릿 스크립트 구현:
+- 페이지 HTML 수집 기능
+- 분석 모듈 로딩 시스템
+- 오버레이 UI 초기화
+- 에러 핸들링 및 로깅
+
+3. 파일 구조 설정:
+- `/assets/js/bookmarklet.js` (비압축 소스)
+- `/assets/js/bookmarklet.min.js` (압축 버전)
+- `/assets/js/utils/parser.js` (HTML 파싱 유틸리티)
+
+4. 북마클릿 크기 제한 문제 해결을 위한 로더 패턴 구현
+
+# Test Strategy:
+1. 다양한 브라우저(Chrome, Firefox, Safari)에서 북마클릿 실행 테스트
+2. 정적 페이지와 동적 페이지(SPA)에서의 HTML 수집 정확도 검증
+3. 오류 발생 시 적절한 사용자 피드백 제공 확인
+4. 북마클릿 URL 길이 제한 내에서 작동하는지 확인
+
+# Subtasks:
+## 1. Design and implement the loader script [done]
+### Dependencies: None
+### Description: Create a minimal loader script that can dynamically fetch and execute the main bookmarklet functionality
+### Details:
+Develop a lightweight loader script (<2KB) that can be used as the actual bookmarklet code. It should handle cross-browser compatibility, create a namespace to avoid conflicts, and implement error handling. The loader should be able to fetch the main script from a CDN or specified location.
+
+## 2. Establish file structure and build process [done]
+### Dependencies: 1.1
+### Description: Set up the project file structure and build process to optimize the bookmarklet for production
+### Details:
+Create a modular file structure that separates concerns. Implement a build process using tools like Webpack or Rollup to minify and bundle the code. Set up version control and documentation. Create a process to generate the final bookmarklet URL with the encoded JavaScript.
+
+## 3. Develop main script core functionality [done]
+### Dependencies: 1.1, 1.2
+### Description: Implement the core features of the main bookmarklet script
+### Details:
+Develop the main script with modular architecture. Implement DOM manipulation functions, user interface components, data processing logic, and any API integrations required. Ensure the script can handle both static and dynamic page content through appropriate event listeners and observers.
+
+## 4. Implement size limitation solutions [done]
+### Dependencies: 1.2, 1.3
+### Description: Address bookmarklet size limitations through optimization techniques
+### Details:
+Implement lazy loading for non-critical features. Use code splitting to load functionality on-demand. Optimize dependencies and consider using service workers for caching if appropriate. Test the bookmarklet across different browsers to ensure size limitations don't affect functionality. Document size optimization strategies for future development.
+<info added on 2025-05-15T04:14:42.681Z>
+Implement lazy loading for non-critical features. Use code splitting to load functionality on-demand. Optimize dependencies and consider using service workers for caching if appropriate. Test the bookmarklet across different browsers to ensure size limitations don't affect functionality. Document size optimization strategies for future development.
+
+The size limitation solutions were successfully implemented with impressive results. The bookmarklet URL size was reduced from 4341 bytes to 1244 bytes, achieving a 71% reduction. A three-tier architecture was implemented consisting of a minimal loader script (644 bytes), a bootstrap module for dynamic loading, and on-demand loading of feature modules. Advanced code minification techniques were applied including custom pattern replacement, function aliasing, variable shortening, and code structure optimization. Comprehensive documentation was created covering size optimization strategies, browser compatibility tests, and a pull request template for future optimizations. The implementation is now compatible with all major browsers, including Internet Explorer's URL size limit of 2083 bytes, and testing confirmed proper functionality across Chrome, Firefox, Safari, and Edge.
+</info added on 2025-05-15T04:14:42.681Z>
+

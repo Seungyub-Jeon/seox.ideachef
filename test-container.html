@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlay Container Test</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/overlay.css">
+    <style>
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .test-panel {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .test-controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .config-section {
+            margin: 20px 0;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        
+        .config-section h3 {
+            margin-top: 0;
+        }
+        
+        .config-option {
+            margin-bottom: 10px;
+        }
+        
+        .config-option label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        button {
+            padding: 8px 16px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background-color: #3367d6;
+        }
+        
+        select, input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-panel">
+        <h1>Overlay Container Test</h1>
+        <p>This page demonstrates the new modular overlay container implementation.</p>
+        
+        <div class="test-controls">
+            <button id="showContainerBtn">Show Container</button>
+            <button id="hideContainerBtn">Hide Container</button>
+        </div>
+        
+        <div class="config-section">
+            <h3>Configuration Options</h3>
+            
+            <div class="config-option">
+                <label for="positionSelect">Position:</label>
+                <select id="positionSelect">
+                    <option value="top-right">Top Right</option>
+                    <option value="top-left">Top Left</option>
+                    <option value="bottom-right">Bottom Right</option>
+                    <option value="bottom-left">Bottom Left</option>
+                    <option value="center">Center</option>
+                </select>
+            </div>
+            
+            <div class="config-option">
+                <label for="titleInput">Title:</label>
+                <input type="text" id="titleInput" value="한국어 웹사이트 분석기">
+            </div>
+            
+            <div class="config-option">
+                <label for="defaultTabSelect">Default Tab:</label>
+                <select id="defaultTabSelect">
+                    <option value="요약">요약</option>
+                    <option value="SEO">SEO</option>
+                    <option value="웹표준">웹표준</option>
+                    <option value="웹접근성">웹접근성</option>
+                    <option value="성능">성능</option>
+                    <option value="모바일">모바일</option>
+                    <option value="보안">보안</option>
+                </select>
+            </div>
+            
+            <div class="config-option">
+                <label>Options:</label>
+                <div>
+                    <input type="checkbox" id="showHeaderCheck" checked>
+                    <label for="showHeaderCheck">Show Header</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="showCloseCheck" checked>
+                    <label for="showCloseCheck">Show Close Button</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="showTabsCheck" checked>
+                    <label for="showTabsCheck">Show Tabs</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="animateCheck" checked>
+                    <label for="animateCheck">Animate</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Define namespace for testing
+        window.KoreanWebAnalyzer = {
+            ui: {
+                overlay: {}
+            },
+            logger: {
+                debug: console.log,
+                error: console.error,
+                info: console.info,
+                warn: console.warn
+            }
+        };
+        
+        // Define container module
+        window.KoreanWebAnalyzer.ui.overlay.container = {
+            create: function(options) {
+                options = options || {};
+                
+                // 기본 옵션 설정
+                const defaultOptions = {
+                    id: 'korean-web-analyzer-overlay',
+                    className: 'kwa-overlay',
+                    position: 'top-right',
+                    width: '380px',
+                    maxWidth: '90vw',
+                    maxHeight: '80vh',
+                    zIndex: 2147483647,
+                    showHeader: true,
+                    showTabs: true,
+                    showClose: true,
+                    title: '한국어 웹사이트 분석기',
+                    tabNames: ['요약', 'SEO', '웹표준', '웹접근성', '성능', '모바일', '보안'],
+                    defaultTab: '요약',
+                    animate: true
+                };
+                
+                // 옵션 병합
+                const mergedOptions = Object.assign({}, defaultOptions, options);
+                
+                // 컨테이너 생성
+                const container = document.createElement('div');
+                container.id = mergedOptions.id;
+                container.className = mergedOptions.className;
+                
+                // 위치 설정
+                this.setPosition(container, mergedOptions.position);
+                
+                // 헤더 추가 (옵션에 따라)
+                if (mergedOptions.showHeader) {
+                    const header = this.createHeader({
+                        showClose: mergedOptions.showClose,
+                        title: mergedOptions.title
+                    });
+                    container.appendChild(header);
+                }
+                
+                // 탭 추가 (옵션에 따라)
+                if (mergedOptions.showTabs) {
+                    const tabs = this.createTabs({
+                        tabNames: mergedOptions.tabNames,
+                        defaultTab: mergedOptions.defaultTab
+                    });
+                    container.appendChild(tabs);
+                }
+                
+                // 콘텐츠 영역 추가
+                const content = this.createContent({
+                    tabNames: mergedOptions.tabNames,
+                    defaultTab: mergedOptions.defaultTab
+                });
+                container.appendChild(content);
+                
+                // 애니메이션 클래스 추가 (지연)
+                if (mergedOptions.animate) {
+                    setTimeout(() => {
+                        container.classList.add('visible');
+                    }, 10);
+                }
+                
+                return container;
+            },
+            
+            setPosition: function(container, position) {
+                container.style.position = 'fixed';
+                container.style.zIndex = '2147483647';
+                
+                switch (position) {
+                    case 'top-right':
+                        container.style.top = '20px';
+                        container.style.right = '20px';
+                        break;
+                    case 'top-left':
+                        container.style.top = '20px';
+                        container.style.left = '20px';
+                        break;
+                    case 'bottom-right':
+                        container.style.bottom = '20px';
+                        container.style.right = '20px';
+                        break;
+                    case 'bottom-left':
+                        container.style.bottom = '20px';
+                        container.style.left = '20px';
+                        break;
+                    case 'center':
+                        container.style.top = '50%';
+                        container.style.left = '50%';
+                        container.style.transform = 'translate(-50%, -50%)';
+                        break;
+                    default:
+                        container.style.top = '20px';
+                        container.style.right = '20px';
+                }
+            },
+            
+            createHeader: function(options) {
+                const header = document.createElement('div');
+                header.className = 'kwa-header';
+                
+                const title = document.createElement('h2');
+                title.textContent = options.title || '한국어 웹사이트 분석기';
+                header.appendChild(title);
+                
+                if (options.showClose) {
+                    const closeBtn = document.createElement('button');
+                    closeBtn.className = 'kwa-close-btn';
+                    closeBtn.innerHTML = '&times;';
+                    closeBtn.setAttribute('aria-label', '닫기');
+                    closeBtn.setAttribute('title', '닫기');
+                    
+                    closeBtn.addEventListener('click', function() {
+                        const overlay = document.getElementById('korean-web-analyzer-overlay');
+                        if (overlay) {
+                            overlay.classList.remove('visible');
+                            setTimeout(() => {
+                                if (overlay.parentNode) {
+                                    overlay.parentNode.removeChild(overlay);
+                                }
+                            }, 300); // Match animation duration
+                        }
+                    });
+                    
+                    header.appendChild(closeBtn);
+                }
+                
+                return header;
+            },
+            
+            createTabs: function(options) {
+                const tabContainer = document.createElement('div');
+                tabContainer.className = 'kwa-tabs';
+                
+                const tabNames = options.tabNames || ['요약', 'SEO', '웹표준', '웹접근성', '성능', '모바일', '보안'];
+                const defaultTab = options.defaultTab || '요약';
+                
+                tabNames.forEach(tabName => {
+                    const tab = document.createElement('div');
+                    tab.className = 'kwa-tab';
+                    tab.dataset.tab = tabName.toLowerCase();
+                    tab.textContent = tabName;
+                    
+                    if (tabName === defaultTab) {
+                        tab.classList.add('active');
+                    }
+                    
+                    tab.addEventListener('click', function(e) {
+                        // Deactivate all tabs
+                        document.querySelectorAll('.kwa-tab').forEach(t => {
+                            t.classList.remove('active');
+                        });
+                        
+                        // Activate clicked tab
+                        e.target.classList.add('active');
+                        
+                        // Hide all tab contents
+                        document.querySelectorAll('.kwa-tab-content').forEach(c => {
+                            c.classList.remove('active');
+                        });
+                        
+                        // Show the corresponding content
+                        const contentId = 'kwa-tab-' + tabName.toLowerCase();
+                        const content = document.getElementById(contentId);
+                        if (content) {
+                            content.classList.add('active');
+                        }
+                    });
+                    
+                    tabContainer.appendChild(tab);
+                });
+                
+                return tabContainer;
+            },
+            
+            createContent: function(options) {
+                const contentContainer = document.createElement('div');
+                contentContainer.className = 'kwa-content';
+                
+                const tabNames = options.tabNames || ['요약', 'SEO', '웹표준', '웹접근성', '성능', '모바일', '보안'];
+                const defaultTab = options.defaultTab || '요약';
+                
+                tabNames.forEach(tabName => {
+                    const tabContent = document.createElement('div');
+                    tabContent.className = 'kwa-tab-content';
+                    tabContent.id = 'kwa-tab-' + tabName.toLowerCase();
+                    
+                    // Add some placeholder content
+                    tabContent.innerHTML = `
+                        <h3>${tabName} 콘텐츠</h3>
+                        <p>이 탭의 콘텐츠는 실제 구현에서 동적으로 추가됩니다.</p>
+                        <p>현재는 테스트용 더미 콘텐츠입니다.</p>
+                    `;
+                    
+                    if (tabName === defaultTab) {
+                        tabContent.classList.add('active');
+                    }
+                    
+                    contentContainer.appendChild(tabContent);
+                });
+                
+                return contentContainer;
+            }
+        };
+        
+        // Add event listeners
+        document.getElementById('showContainerBtn').addEventListener('click', function() {
+            // Remove any existing container
+            const existingContainer = document.getElementById('korean-web-analyzer-overlay');
+            if (existingContainer && existingContainer.parentNode) {
+                existingContainer.parentNode.removeChild(existingContainer);
+            }
+            
+            // Get configuration options
+            const options = {
+                position: document.getElementById('positionSelect').value,
+                title: document.getElementById('titleInput').value,
+                defaultTab: document.getElementById('defaultTabSelect').value,
+                showHeader: document.getElementById('showHeaderCheck').checked,
+                showClose: document.getElementById('showCloseCheck').checked,
+                showTabs: document.getElementById('showTabsCheck').checked,
+                animate: document.getElementById('animateCheck').checked
+            };
+            
+            // Create and add container
+            const container = window.KoreanWebAnalyzer.ui.overlay.container.create(options);
+            document.body.appendChild(container);
+        });
+        
+        document.getElementById('hideContainerBtn').addEventListener('click', function() {
+            const container = document.getElementById('korean-web-analyzer-overlay');
+            if (container) {
+                container.classList.remove('visible');
+                setTimeout(() => {
+                    if (container.parentNode) {
+                        container.parentNode.removeChild(container);
+                    }
+                }, 300); // Match animation duration
+            }
+        });
+    </script>
+</body>
+</html>

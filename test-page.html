@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>북마클릿 테스트 페이지</title>
+    <style>
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .content {
+            margin-bottom: 2rem;
+        }
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .image-gallery img {
+            width: 100%;
+            /* 의도적으로 height 속성 제거하여 CLS 이슈 생성 */
+            border-radius: 5px;
+        }
+        /* 의도적으로 화면에 늦게 로드되는 배너 광고 시뮬레이션 */
+        .late-loading-banner {
+            width: 100%;
+            height: 100px;
+            background-color: #f0f0f0;
+            margin: 20px 0;
+            text-align: center;
+            line-height: 100px;
+            display: none; /* 처음에는 숨김 */
+        }
+        footer {
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+            padding-top: 20px;
+            text-align: center;
+            color: #666;
+        }
+        /* 일부러 문제점을 만들기 위한 스타일 */
+        .problematic-contrast {
+            color: #aaa;
+            background-color: #f8f8f8;
+            padding: 10px;
+        }
+        .too-small-touch {
+            display: inline-block;
+            padding: 5px;
+            font-size: 12px;
+            border: 1px solid #ddd;
+        }
+        /* FID 문제를 위한 무거운 이벤트 핸들러 시뮬레이션 */
+        .heavy-button {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        /* 큰 이미지 (LCP 문제 시뮬레이션) */
+        .hero-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            margin: 20px 0;
+        }
+    </style>
+    <!-- Web Vitals 테스트를 위한 링크 -->
+    <link rel="stylesheet" href="assets/css/web-vitals.css">
+</head>
+<body>
+    <header>
+        <h1>북마클릿 테스트 페이지</h1>
+        <p>이 페이지는 한국어 웹사이트 분석기 북마클릿 테스트를 위해 작성되었습니다.</p>
+    </header>
+
+    <div class="content">
+        <h2>테스트 섹션 1</h2>
+        <p>이 섹션은 여러 접근성 및 SEO 이슈를 포함하고 있습니다.</p>
+        
+        <h4>헤딩 레벨 건너뜀</h4>
+        <p>이 부분은 h2와 h4 사이에 h3가 없습니다. 이는 헤딩 구조의 문제점입니다.</p>
+        
+        <div class="image-gallery">
+            <!-- 대체 텍스트 없는 이미지 -->
+            <img src="https://via.placeholder.com/150" width="150" height="150">
+            <!-- 의미 없는 대체 텍스트 이미지 -->
+            <img src="https://via.placeholder.com/150" alt="image.jpg" width="150" height="150">
+            <!-- 적절한 대체 텍스트 이미지 -->
+            <img src="https://via.placeholder.com/150" alt="예시 이미지 - 회색 정사각형" width="150" height="150">
+        </div>
+        
+        <div class="problematic-contrast">
+            이 텍스트는 배경색과 충분한 대비를 가지지 않아 가독성이 떨어집니다.
+        </div>
+        
+        <p>
+            <!-- 유효하지 않은 링크 -->
+            <a>링크 텍스트만 있고 href가 없습니다</a><br>
+            <!-- 의미 없는 링크 텍스트 -->
+            <a href="https://example.com">여기를 클릭</a><br>
+            <!-- 설명적인 링크 텍스트 -->
+            <a href="https://example.com">예시 웹사이트 방문하기</a>
+        </p>
+        
+        <div class="mobile-issues">
+            <p>모바일 친화성 테스트:</p>
+            <a href="#" class="too-small-touch">너무 작은 터치 영역</a>
+        </div>
+    </div>
+    
+    <div class="content">
+        <h2>테스트 섹션 2</h2>
+        <p>이 섹션은 더 많은 테스트 콘텐츠를 제공합니다.</p>
+        
+        <table>
+            <tr>
+                <td>테이블 헤더 없음</td>
+                <td>접근성 문제</td>
+            </tr>
+            <tr>
+                <td>데이터 1</td>
+                <td>데이터 2</td>
+            </tr>
+        </table>
+    </div>
+    
+    <footer>
+        <p>© 2025 테스트 페이지. 모든 권리 보유.</p>
+    </footer>
+    
+    <!-- Core Web Vitals 테스트 섹션 -->
+    <div class="content">
+        <h2>Core Web Vitals 테스트</h2>
+        <p>이 섹션은 Core Web Vitals(LCP, FID, CLS) 문제를 시뮬레이션합니다.</p>
+        
+        <!-- LCP 테스트를 위한 큰 히어로 이미지 -->
+        <img src="https://via.placeholder.com/1200x600" alt="큰 히어로 이미지" class="hero-image">
+        
+        <!-- FID 테스트를 위한 버튼 -->
+        <div>
+            <button class="heavy-button" id="heavy-button">무거운 JavaScript 실행 (FID 테스트)</button>
+            <p>이 버튼을 클릭하면 메인 스레드를 차단하는 무거운 계산을 실행합니다.</p>
+        </div>
+        
+        <!-- CLS 테스트를 위한 늦게 로드되는 요소 -->
+        <div class="late-loading-banner" id="late-banner">늦게 로드되는 배너 - CLS 문제 시뮬레이션</div>
+        
+        <p>아래는 width 및 height가 설정되지 않은 이미지로, 레이아웃 이동을 유발합니다.</p>
+        <div class="image-gallery" id="cls-gallery">
+            <img src="https://via.placeholder.com/300x200" alt="CLS 테스트 이미지 1">
+            <img src="https://via.placeholder.com/200x300" alt="CLS 테스트 이미지 2">
+            <img src="https://via.placeholder.com/400x300" alt="CLS 테스트 이미지 3">
+        </div>
+    </div>
+    
+    <!-- 불필요한 빈 스크립트 태그 -->
+    <script>
+        // FID 문제 시뮬레이션 - 메인 스레드 차단
+        document.getElementById('heavy-button').addEventListener('click', function() {
+            // 무거운 계산으로 메인 스레드 차단
+            const startTime = Date.now();
+            while (Date.now() - startTime < 500) {
+                // 500ms 동안 루프 (의도적으로 긴 지연 발생)
+            }
+            alert('무거운 계산 완료');
+        });
+        
+        // CLS 문제 시뮬레이션 - 늦게 로드되는 배너
+        setTimeout(function() {
+            const banner = document.getElementById('late-banner');
+            banner.style.display = 'block';
+        }, 2000);
+        
+        // 북마클릿 로드 함수
+        function loadBookmarklet() {
+            const script = document.createElement('script');
+            script.src = 'assets/js/loader.min.js';
+            document.body.appendChild(script);
+        }
+    </script>
+</body>
+</html>

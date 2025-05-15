@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>종합 보고서 테스트</title>
+    <style>
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .container {
+            margin-bottom: 2rem;
+            border: 1px solid #eee;
+            padding: 1rem;
+            border-radius: 5px;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        .result-container {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .score {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .score-circle {
+            display: inline-block;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .score-circle-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .summary {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+        }
+        .score-category {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        .score-bar {
+            flex-grow: 1;
+            height: 24px;
+            background-color: #eee;
+            margin: 0 10px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .score-value {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        .score-grade {
+            font-weight: bold;
+            width: 30px;
+            text-align: center;
+        }
+        .issues-container {
+            margin-top: 2rem;
+        }
+        .issue {
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            border-radius: 5px;
+            border-left: 5px solid #ccc;
+        }
+        .issue.critical {
+            background-color: #ffebee;
+            border-left-color: #f44336;
+        }
+        .issue.major {
+            background-color: #fff8e1;
+            border-left-color: #ffc107;
+        }
+        .issue.minor {
+            background-color: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+        .issue.info {
+            background-color: #e3f2fd;
+            border-left-color: #2196f3;
+        }
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .issue-category {
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            background-color: rgba(0,0,0,0.1);
+        }
+        .recommendations-container {
+            margin-top: 2rem;
+        }
+        .recommendation {
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: flex-start;
+        }
+        .recommendation-priority {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        .recommendation-content {
+            flex-grow: 1;
+        }
+        .recommendation-category {
+            font-size: 0.9rem;
+            color: #757575;
+            margin-bottom: 0.5rem;
+        }
+        .recommendation-message {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .priority-high {
+            background-color: #f44336;
+        }
+        .priority-medium {
+            background-color: #ff9800;
+        }
+        .priority-low {
+            background-color: #4caf50;
+        }
+        button {
+            padding: 0.6rem 1.2rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        .tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            transition: background-color 0.3s;
+        }
+        .tab.active {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #f8f9fa;
+            font-weight: bold;
+        }
+        .tab:hover:not(.active) {
+            background-color: #f1f1f1;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 5px solid #4CAF50;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .radar-chart {
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .radar-chart-labels {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+        .radar-chart-label {
+            position: absolute;
+            font-size: 12px;
+        }
+        .radar-chart-polygon {
+            fill: rgba(76, 175, 80, 0.3);
+            stroke: #4CAF50;
+            stroke-width: 2;
+        }
+        .radar-chart-circles {
+            fill: none;
+            stroke: #e0e0e0;
+            stroke-dasharray: 4 4;
+        }
+        .two-column {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .column {
+            width: 48%;
+        }
+        @media (max-width: 768px) {
+            .column {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>종합 보고서 테스트</h1>
+        <p>웹사이트 분석 종합 보고서 생성 모듈 테스트 페이지입니다.</p>
+    </header>
+
+    <div class="container">
+        <h2>분석 기능</h2>
+        <button id="runAnalysis">종합 분석 실행</button>
+        <button id="mockAnalysis">목업 데이터로 테스트</button>
+        
+        <div class="result-container" id="result">
+            <p>분석 버튼을 클릭하여 테스트를 시작하세요.</p>
+        </div>
+    </div>
+
+    <div class="container" id="reportContainer" style="display: none;">
+        <h2>종합 보고서</h2>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="overview">개요</div>
+            <div class="tab" data-tab="issues">이슈</div>
+            <div class="tab" data-tab="recommendations">개선 제안</div>
+            <div class="tab" data-tab="details">상세 결과</div>
+        </div>
+
+        <div class="tab-content active" id="overview">
+            <!-- 점수 및 요약 표시 영역 -->
+            <div id="reportOverview"></div>
+        </div>
+
+        <div class="tab-content" id="issues">
+            <!-- 주요 이슈 표시 영역 -->
+            <h3>주요 이슈</h3>
+            <div id="topIssues"></div>
+        </div>
+
+        <div class="tab-content" id="recommendations">
+            <!-- 권장사항 표시 영역 -->
+            <h3>추천 개선 사항</h3>
+            <div id="recommendations"></div>
+        </div>
+
+        <div class="tab-content" id="details">
+            <!-- 상세 결과 표시 영역 -->
+            <h3>카테고리별 상세 결과</h3>
+            <div id="detailResults"></div>
+        </div>
+    </div>
+    
+    <!-- 코어 JS 파일 로드 -->
+    <script src="/assets/js/core.js"></script>
+    
+    <!-- 유틸리티 JS 파일 로드 -->
+    <script src="/assets/js/utils/analyzer.js"></script>
+    <script src="/assets/js/utils/parser.js"></script>
+    <script src="/assets/js/utils/observer.js"></script>
+    <script src="/assets/js/utils/loader.js"></script>
+    
+    <!-- 분석 모듈 로드 -->
+    <script src="/assets/js/analyzer/seo/index.js"></script>
+    <script src="/assets/js/analyzer/standards/index.js"></script>
+    <script src="/assets/js/analyzer/accessibility/index.js"></script>
+    <script src="/assets/js/analyzer/performance/index.js"></script>
+    <script src="/assets/js/analyzer/mobile/index.js"></script>
+    <script src="/assets/js/analyzer/security/index.js"></script>
+    <script src="/assets/js/analyzer/report/index.js"></script>
+    
+    <script>
+        // DOM 로드 후 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            // 네임스페이스 확인
+            if (!window.KoreanWebAnalyzer) {
+                window.KoreanWebAnalyzer = {
+                    logger: console,
+                    utils: {
+                        analyzer: {
+                            createIssue: function(type, severity, message, details, element, solution) {
+                                return {
+                                    type: type,
+                                    severity: severity,
+                                    message: message,
+                                    details: details,
+                                    element: element,
+                                    solution: solution
+                                };
+                            }
+                        }
+                    },
+                    analyzer: {}
+                };
+            }
+            
+            // 탭 기능
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // 탭 활성화
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 탭 콘텐츠 활성화
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // 분석 실행
+            document.getElementById('runAnalysis').addEventListener('click', runAnalysis);
+            document.getElementById('mockAnalysis').addEventListener('click', runMockAnalysis);
+            
+            // 종합 분석 실행
+            function runAnalysis() {
+                const resultContainer = document.getElementById('result');
+                resultContainer.innerHTML = '<div class="loader"></div><p>종합 분석을 실행 중입니다...</p>';
+                
+                try {
+                    if (window.KoreanWebAnalyzer.analyzer.report) {
+                        const report = window.KoreanWebAnalyzer.analyzer.report.generate(document);
+                        displayReport(report);
+                    } else {
+                        resultContainer.innerHTML = '<p>종합 보고서 모듈을 찾을 수 없습니다.</p>';
+                    }
+                } catch (error) {
+                    resultContainer.innerHTML = `<p>오류 발생: ${error.message}</p>`;
+                    console.error('종합 분석 중 오류 발생:', error);
+                }
+            }
+            
+            // 목업 데이터로 테스트
+            function runMockAnalysis() {
+                const resultContainer = document.getElementById('result');
+                resultContainer.innerHTML = '<div class="loader"></div><p>목업 데이터로 테스트 중...</p>';
+                
+                setTimeout(() => {
+                    // 목업 보고서 데이터
+                    const mockReport = generateMockReport();
+                    displayReport(mockReport);
+                }, 1000);
+            }
+            
+            // 보고서 표시
+            function displayReport(report) {
+                // 결과 컨테이너 업데이트
+                const resultContainer = document.getElementById('result');
+                resultContainer.innerHTML = `
+                    <div class="score">
+                        <div class="score-circle" style="background: conic-gradient(#4CAF50 0% ${report.score}%, #f5f5f5 ${report.score}% 100%)">
+                            <div class="score-circle-inner">${report.score}</div>
+                        </div>
+                    </div>
+                    <div class="summary">${report.summary}</div>
+                `;
+                
+                // 카테고리별 점수 표시
+                let categoryScoresHtml = '';
+                for (const [category, score] of Object.entries(report.categoryScores)) {
+                    // 카테고리 표시 이름
+                    const categoryNames = {
+                        seo: 'SEO',
+                        standards: '웹표준',
+                        accessibility: '웹접근성',
+                        performance: '성능',
+                        mobile: '모바일 친화성',
+                        security: '보안'
+                    };
+                    
+                    const categoryName = categoryNames[category] || category;
+                    
+                    // 등급 계산
+                    const grade = getGradeFromScore(score);
+                    const color = getColorFromGrade(grade);
+                    
+                    categoryScoresHtml += `
+                        <div class="score-category">
+                            <div style="width: 120px;">${categoryName}</div>
+                            <div class="score-bar">
+                                <div class="score-value" style="width: ${score}%; background-color: ${color};"></div>
+                            </div>
+                            <div style="width: 40px; text-align: right;">${score}</div>
+                            <div class="score-grade" style="color: ${color};">${grade}</div>
+                        </div>
+                    `;
+                }
+                
+                resultContainer.innerHTML += categoryScoresHtml;
+                
+                // 보고서 컨테이너 표시
+                document.getElementById('reportContainer').style.display = 'block';
+                
+                // 개요 탭 업데이트
+                updateOverviewTab(report);
+                
+                // 이슈 탭 업데이트
+                updateIssuesTab(report);
+                
+                // 권장사항 탭 업데이트
+                updateRecommendationsTab(report);
+                
+                // 상세 결과 탭 업데이트
+                updateDetailsTab(report);
+                
+                // 점수 바 애니메이션
+                setTimeout(() => {
+                    const scoreValues = document.querySelectorAll('.score-value');
+                    scoreValues.forEach(value => {
+                        const width = value.style.width;
+                        value.style.width = '0%';
+                        setTimeout(() => {
+                            value.style.width = width;
+                        }, 100);
+                    });
+                }, 100);
+            }
+            
+            // 개요 탭 업데이트
+            function updateOverviewTab(report) {
+                const overviewContainer = document.getElementById('reportOverview');
+                
+                // 레이더 차트 데이터 준비
+                const categories = Object.keys(report.categoryScores);
+                const scores = categories.map(category => report.categoryScores[category]);
+                
+                // 레이더 차트 생성
+                const radarChartHtml = generateRadarChart(categories, scores);
+                
+                // 종합 정보 표시
+                overviewContainer.innerHTML = `
+                    <div class="two-column">
+                        <div class="column">
+                            <h3>웹사이트 성능 요약</h3>
+                            <p>${report.summary}</p>
+                            
+                            <h4>핵심 지표</h4>
+                            <p>전체 점수: <strong>${report.score}/100</strong></p>
+                            <p>분석된 카테고리: <strong>${categories.length}개</strong></p>
+                            <p>주요 이슈: <strong>${report.topIssues.length}개</strong></p>
+                            <p>개선 제안: <strong>${report.recommendations.length}개</strong></p>
+                        </div>
+                        
+                        <div class="column">
+                            <h3>카테고리별 점수</h3>
+                            <div class="radar-chart">
+                                ${radarChartHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // 이슈 탭 업데이트
+            function updateIssuesTab(report) {
+                const issuesContainer = document.getElementById('topIssues');
+                
+                if (!report.topIssues || report.topIssues.length === 0) {
+                    issuesContainer.innerHTML = '<p>주요 이슈가 없습니다.</p>';
+                    return;
+                }
+                
+                let issuesHtml = '';
+                
+                report.topIssues.forEach(issue => {
+                    // 카테고리 이름
+                    const categoryName = issue.categoryName || issue.category;
+                    const subCategory = issue.subCategory ? ` - ${issue.subCategory}` : '';
+                    
+                    issuesHtml += `
+                        <div class="issue ${issue.severity}">
+                            <div class="issue-header">
+                                <span class="issue-category">${categoryName}${subCategory}</span>
+                                <span class="issue-severity">${getSeverityName(issue.severity)}</span>
+                            </div>
+                            <div class="issue-message"><strong>${issue.message}</strong></div>
+                            <div class="issue-details">${issue.details || ''}</div>
+                            ${issue.solution ? `<div class="issue-solution"><em>해결 방법: ${issue.solution}</em></div>` : ''}
+                        </div>
+                    `;
+                });
+                
+                issuesContainer.innerHTML = issuesHtml;
+            }
+            
+            // 권장사항 탭 업데이트
+            function updateRecommendationsTab(report) {
+                const recommendationsContainer = document.getElementById('recommendations');
+                
+                if (!report.recommendations || report.recommendations.length === 0) {
+                    recommendationsContainer.innerHTML = '<p>개선 제안이 없습니다.</p>';
+                    return;
+                }
+                
+                let recommendationsHtml = '';
+                
+                // 우선순위 순으로 정렬
+                const sortedRecommendations = [...report.recommendations].sort((a, b) => b.priority - a.priority);
+                
+                sortedRecommendations.forEach(recommendation => {
+                    // 우선순위 클래스 결정
+                    let priorityClass = 'priority-medium';
+                    if (recommendation.priority >= 70) {
+                        priorityClass = 'priority-high';
+                    } else if (recommendation.priority <= 40) {
+                        priorityClass = 'priority-low';
+                    }
+                    
+                    // 카테고리 이름
+                    const categoryName = recommendation.categoryName || recommendation.category;
+                    const subCategory = recommendation.subCategory ? ` - ${recommendation.subCategory}` : '';
+                    
+                    recommendationsHtml += `
+                        <div class="recommendation">
+                            <div class="recommendation-priority ${priorityClass}">${Math.min(99, recommendation.priority)}</div>
+                            <div class="recommendation-content">
+                                <div class="recommendation-category">${categoryName}${subCategory} · ${getSeverityName(recommendation.severity)}</div>
+                                <div class="recommendation-message">${recommendation.message}</div>
+                                <div class="recommendation-solution">${recommendation.solution}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                recommendationsContainer.innerHTML = recommendationsHtml;
+            }
+            
+            // 상세 결과 탭 업데이트
+            function updateDetailsTab(report) {
+                const detailsContainer = document.getElementById('detailResults');
+                
+                if (!report.details || Object.keys(report.details).length === 0) {
+                    detailsContainer.innerHTML = '<p>상세 결과가 없습니다.</p>';
+                    return;
+                }
+                
+                let detailsHtml = '';
+                
+                // 각 카테고리별 결과 표시
+                for (const [category, result] of Object.entries(report.details)) {
+                    // 카테고리 표시 이름
+                    const categoryNames = {
+                        seo: 'SEO',
+                        standards: '웹표준',
+                        accessibility: '웹접근성',
+                        performance: '성능',
+                        mobile: '모바일 친화성',
+                        security: '보안'
+                    };
+                    
+                    const categoryName = categoryNames[category] || category;
+                    
+                    // 등급 계산
+                    const score = result.score || 0;
+                    const grade = getGradeFromScore(score);
+                    const color = getColorFromGrade(grade);
+                    
+                    detailsHtml += `
+                        <div class="container" style="margin-top: 1rem;">
+                            <h3>${categoryName} <span style="color: ${color};">(${score}/100, 등급: ${grade})</span></h3>
+                    `;
+                    
+                    // 세부 결과 표시 (다양한 형태 처리)
+                    if (result.details) {
+                        // 각 세부 카테고리별 점수 표시
+                        for (const [subCategory, subResult] of Object.entries(result.details)) {
+                            if (typeof subResult.score === 'number') {
+                                const subGrade = getGradeFromScore(subResult.score);
+                                const subColor = getColorFromGrade(subGrade);
+                                
+                                detailsHtml += `
+                                    <div class="score-category">
+                                        <div style="width: 150px;">${subCategory}</div>
+                                        <div class="score-bar">
+                                            <div class="score-value" style="width: ${subResult.score}%; background-color: ${subColor};"></div>
+                                        </div>
+                                        <div style="width: 40px; text-align: right;">${subResult.score}</div>
+                                        <div class="score-grade" style="color: ${subColor};">${subGrade}</div>
+                                    </div>
+                                `;
+                            }
+                        }
+                    }
+                    
+                    detailsHtml += `</div>`;
+                }
+                
+                detailsContainer.innerHTML = detailsHtml;
+                
+                // 점수 바 애니메이션
+                setTimeout(() => {
+                    const scoreValues = document.querySelectorAll('#detailResults .score-value');
+                    scoreValues.forEach(value => {
+                        const width = value.style.width;
+                        value.style.width = '0%';
+                        setTimeout(() => {
+                            value.style.width = width;
+                        }, 100);
+                    });
+                }, 100);
+            }
+            
+            // 레이더 차트 생성
+            function generateRadarChart(categories, scores) {
+                // 표시 이름 변환
+                const categoryNames = {
+                    seo: 'SEO',
+                    standards: '웹표준',
+                    accessibility: '웹접근성',
+                    performance: '성능',
+                    mobile: '모바일',
+                    security: '보안'
+                };
+                
+                const displayNames = categories.map(cat => categoryNames[cat] || cat);
+                
+                // 차트 중심점 및 반지름
+                const centerX = 200;
+                const centerY = 200;
+                const radius = 150;
+                
+                // SVG 생성
+                let svg = `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">`;
+                
+                // 배경 원 (20%, 40%, 60%, 80%, 100%)
+                for (let i = 1; i <= 5; i++) {
+                    const circleRadius = radius * (i / 5);
+                    svg += `<circle cx="${centerX}" cy="${centerY}" r="${circleRadius}" class="radar-chart-circles" />`;
+                }
+                
+                // 축 그리기
+                const points = [];
+                const labelPositions = [];
+                
+                for (let i = 0; i < categories.length; i++) {
+                    const angle = (Math.PI * 2 * i) / categories.length - Math.PI / 2;
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+                    
+                    // 축 선
+                    svg += `<line x1="${centerX}" y1="${centerY}" x2="${x}" y2="${y}" stroke="#e0e0e0" />`;
+                    
+                    // 라벨 위치 계산
+                    const labelX = centerX + (radius + 20) * Math.cos(angle);
+                    const labelY = centerY + (radius + 20) * Math.sin(angle);
+                    labelPositions.push({ x: labelX, y: labelY, angle });
+                }
+                
+                // 데이터 다각형 그리기
+                for (let i = 0; i < categories.length; i++) {
+                    const angle = (Math.PI * 2 * i) / categories.length - Math.PI / 2;
+                    const score = scores[i] / 100; // 0-1 사이 값으로 정규화
+                    const x = centerX + radius * score * Math.cos(angle);
+                    const y = centerY + radius * score * Math.sin(angle);
+                    points.push(`${x},${y}`);
+                }
+                
+                svg += `<polygon points="${points.join(' ')}" class="radar-chart-polygon" />`;
+                
+                // 데이터 포인트 그리기
+                for (let i = 0; i < categories.length; i++) {
+                    const angle = (Math.PI * 2 * i) / categories.length - Math.PI / 2;
+                    const score = scores[i] / 100;
+                    const x = centerX + radius * score * Math.cos(angle);
+                    const y = centerY + radius * score * Math.sin(angle);
+                    
+                    svg += `<circle cx="${x}" cy="${y}" r="4" fill="#4CAF50" />`;
+                }
+                
+                svg += `</svg>`;
+                
+                // 라벨 추가 (SVG 외부에 별도로 추가)
+                let labels = `<div class="radar-chart-labels">`;
+                
+                for (let i = 0; i < displayNames.length; i++) {
+                    const { x, y, angle } = labelPositions[i];
+                    
+                    // 라벨 위치 조정 (중앙 정렬)
+                    const textAnchor = angle < -Math.PI / 4 && angle > -Math.PI * 3 / 4 ? 'middle' : 
+                                     angle >= -Math.PI / 4 && angle <= Math.PI / 4 ? 'start' : 'end';
+                    
+                    const xOffset = textAnchor === 'start' ? 5 : (textAnchor === 'end' ? -5 : 0);
+                    const yOffset = angle < -Math.PI * 3 / 4 || angle > Math.PI / 4 ? 5 : 
+                                  (angle > -Math.PI * 3 / 4 && angle < -Math.PI / 4) ? -5 : 0;
+                    
+                    labels += `
+                        <div class="radar-chart-label" style="
+                            left: ${x - centerX + 200 + xOffset}px; 
+                            top: ${y - centerY + 200 + yOffset}px; 
+                            text-align: ${textAnchor === 'start' ? 'left' : (textAnchor === 'end' ? 'right' : 'center')};
+                        ">
+                            ${displayNames[i]}
+                        </div>
+                    `;
+                }
+                
+                labels += `</div>`;
+                
+                return svg + labels;
+            }
+            
+            // 점수에서 등급 계산
+            function getGradeFromScore(score) {
+                if (score >= 90) return 'A';
+                if (score >= 80) return 'B';
+                if (score >= 70) return 'C';
+                if (score >= 50) return 'D';
+                return 'F';
+            }
+            
+            // 등급에서 색상 계산
+            function getColorFromGrade(grade) {
+                switch (grade) {
+                    case 'A': return '#4CAF50'; // 초록
+                    case 'B': return '#8BC34A'; // 연한 초록
+                    case 'C': return '#FFC107'; // 노랑
+                    case 'D': return '#FF9800'; // 주황
+                    case 'F': return '#F44336'; // 빨강
+                    default: return '#9E9E9E'; // 회색
+                }
+            }
+            
+            // 심각도 이름 변환
+            function getSeverityName(severity) {
+                switch (severity) {
+                    case 'critical': return '심각';
+                    case 'major': return '중요';
+                    case 'minor': return '경미';
+                    case 'info': return '정보';
+                    default: return severity;
+                }
+            }
+            
+            // 목업 데이터 생성
+            function generateMockReport() {
+                return {
+                    score: 75,
+                    categoryScores: {
+                        seo: 85,
+                        standards: 70,
+                        accessibility: 65,
+                        performance: 80,
+                        mobile: 75,
+                        security: 72
+                    },
+                    summary: '웹사이트가 대체로 잘 최적화되어 있으나, 개선할 여지가 있습니다. 가장 잘 최적화된 영역은 SEO(85/100)입니다. 가장 개선이 필요한 영역은 웹접근성(65/100)입니다.',
+                    topIssues: [
+                        {
+                            category: 'accessibility',
+                            categoryName: '웹접근성',
+                            subCategory: 'altText',
+                            severity: 'critical',
+                            message: '이미지에 대체 텍스트가 없습니다.',
+                            details: '대체 텍스트가 없는 이미지가 5개 발견되었습니다.',
+                            solution: '모든 의미 있는 이미지에 alt 속성을 추가하세요.'
+                        },
+                        {
+                            category: 'performance',
+                            categoryName: '성능',
+                            subCategory: 'resourceSize',
+                            severity: 'major',
+                            message: '이미지 파일 크기가 큽니다.',
+                            details: '이미지 총 크기: 2.5MB (권장: 1.5MB 이하)',
+                            solution: '이미지를 최적화하고, WebP 형식 사용, 적절한 크기로 리사이징, 지연 로딩을 적용하세요.'
+                        },
+                        {
+                            category: 'seo',
+                            categoryName: 'SEO',
+                            subCategory: 'metaTags',
+                            severity: 'major',
+                            message: '메타 설명이 너무 짧습니다.',
+                            details: '현재 설명 길이: 35자 (최소 50자 권장)',
+                            solution: '더 구체적이고 정보를 제공하는 메타 설명을 작성하세요.'
+                        },
+                        {
+                            category: 'security',
+                            categoryName: '보안',
+                            subCategory: 'contentSecurity',
+                            severity: 'major',
+                            message: 'Content Security Policy가 설정되지 않았습니다.',
+                            details: 'CSP는 XSS 및 데이터 인젝션 공격을 방지하는 데 도움이 됩니다.',
+                            solution: 'HTTP 헤더 또는 메타 태그를 통해 Content-Security-Policy를 설정하세요.'
+                        },
+                        {
+                            category: 'mobile',
+                            categoryName: '모바일 친화성',
+                            subCategory: 'touchTargets',
+                            severity: 'minor',
+                            message: '터치 타겟이 너무 작습니다.',
+                            details: '크기: 30x30px (권장: 최소 44x44px)',
+                            solution: '모바일 사용자가 쉽게 탭할 수 있도록 터치 영역을 44x44px 이상으로 확장하세요.'
+                        }
+                    ],
+                    recommendations: [
+                        {
+                            category: 'accessibility',
+                            categoryName: '웹접근성',
+                            subCategory: 'altText',
+                            severity: 'critical',
+                            message: '이미지에 대체 텍스트 추가',
+                            solution: '모든 의미 있는 이미지에 alt 속성을 추가하세요.',
+                            priority: 85
+                        },
+                        {
+                            category: 'performance',
+                            categoryName: '성능',
+                            subCategory: 'resourceSize',
+                            severity: 'major',
+                            message: '이미지 파일 최적화',
+                            solution: '이미지를 최적화하고, WebP 형식 사용, 적절한 크기로 리사이징, 지연 로딩을 적용하세요.',
+                            priority: 75
+                        },
+                        {
+                            category: 'security',
+                            categoryName: '보안',
+                            subCategory: 'contentSecurity',
+                            severity: 'major',
+                            message: 'Content Security Policy 설정',
+                            solution: 'HTTP 헤더 또는 메타 태그를 통해 Content-Security-Policy를 설정하세요.',
+                            priority: 70
+                        },
+                        {
+                            category: 'seo',
+                            categoryName: 'SEO',
+                            subCategory: 'metaTags',
+                            severity: 'major',
+                            message: '메타 설명 개선',
+                            solution: '더 구체적이고 정보를 제공하는 메타 설명을 작성하세요.',
+                            priority: 65
+                        },
+                        {
+                            category: 'mobile',
+                            categoryName: '모바일 친화성',
+                            subCategory: 'touchTargets',
+                            severity: 'minor',
+                            message: '터치 타겟 크기 확대',
+                            solution: '모바일 사용자가 쉽게 탭할 수 있도록 터치 영역을 44x44px 이상으로 확장하세요.',
+                            priority: 45
+                        }
+                    ],
+                    details: {
+                        seo: {
+                            score: 85,
+                            details: {
+                                metaTags: { score: 75 },
+                                heading: { score: 90 },
+                                content: { score: 80 },
+                                links: { score: 85 },
+                                images: { score: 95 }
+                            }
+                        },
+                        standards: {
+                            score: 70,
+                            details: {
+                                htmlValidity: { score: 85 },
+                                semanticMarkup: { score: 65 },
+                                deprecated: { score: 75 },
+                                docStructure: { score: 60 }
+                            }
+                        },
+                        accessibility: {
+                            score: 65,
+                            details: {
+                                altText: { score: 50 },
+                                keyboard: { score: 70 },
+                                contrast: { score: 75 },
+                                aria: { score: 60 }
+                            }
+                        },
+                        performance: {
+                            score: 80,
+                            details: {
+                                resourceSize: { score: 70 },
+                                requests: { score: 85 },
+                                loadTime: { score: 75 },
+                                mediaOptimization: { score: 65 },
+                                renderingPerformance: { score: 90 },
+                                caching: { score: 85 },
+                                cdnUsage: { score: 90 }
+                            }
+                        },
+                        mobile: {
+                            score: 75,
+                            details: {
+                                viewport: { score: 100 },
+                                touchTargets: { score: 60 },
+                                fontSizes: { score: 85 },
+                                mediaQueries: { score: 70 },
+                                responsiveDesign: { score: 75 },
+                                touchOptimization: { score: 65 },
+                                contentPriority: { score: 80 },
+                                offlineSupport: { score: 60 }
+                            }
+                        },
+                        security: {
+                            score: 72,
+                            details: {
+                                https: { score: 100 },
+                                contentSecurity: { score: 50 },
+                                forms: { score: 70 },
+                                externalLinks: { score: 75 }
+                            }
+                        }
+                    }
+                };
+            }
+        });
+    </script>
+</body>
+</html>

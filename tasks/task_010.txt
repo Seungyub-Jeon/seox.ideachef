@@ -1,0 +1,162 @@
+# Task ID: 10
+# Title: 서버 측 기능 및 보고서 저장 구현
+# Status: done
+# Dependencies: 9
+# Priority: low
+# Description: PHP 기반 서버 측 기능 개발 및 보고서 저장, 공유 기능 구현
+# Details:
+1. 서버 측 API 엔드포인트 구현:
+```php
+<?php
+// api.php
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+// 요청 메서드 확인
+$method = $_SERVER['REQUEST_METHOD'];
+
+if ($method === 'OPTIONS') {
+    exit(0);
+}
+
+// 요청 처리
+if ($method === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $action = isset($data['action']) ? $data['action'] : '';
+    
+    switch ($action) {
+        case 'save_report':
+            include_once 'lib/db.php';
+            $result = saveReport($data['report']);
+            echo json_encode(['success' => $result['success'], 'id' => $result['id']]);
+            break;
+            
+        case 'analyze':
+            include_once 'lib/analyzer.php';
+            $result = performServerAnalysis($data['url']);
+            echo json_encode($result);
+            break;
+            
+        default:
+            echo json_encode(['error' => 'Unknown action']);
+    }
+} else if ($method === 'GET') {
+    $action = isset($_GET['action']) ? $_GET['action'] : '';
+    
+    switch ($action) {
+        case 'get_report':
+            include_once 'lib/db.php';
+            $id = isset($_GET['id']) ? $_GET['id'] : '';
+            $result = getReport($id);
+            echo json_encode($result);
+            break;
+            
+        default:
+            echo json_encode(['error' => 'Unknown action']);
+    }
+}
+?>
+```
+
+2. 보고서 저장 및 불러오기 기능:
+```php
+<?php
+// lib/db.php
+function saveReport($report) {
+    $id = uniqid();
+    $filename = '../data/reports/' . $id . '.json';
+    
+    // 디렉토리 확인 및 생성
+    if (!file_exists('../data/reports/')) {
+        mkdir('../data/reports/', 0755, true);
+    }
+    
+    // 보고서 저장
+    $success = file_put_contents($filename, json_encode($report));
+    
+    return [
+        'success' => $success !== false,
+        'id' => $id
+    ];
+}
+
+function getReport($id) {
+    $filename = '../data/reports/' . $id . '.json';
+    
+    if (!file_exists($filename)) {
+        return ['error' => 'Report not found'];
+    }
+    
+    $report = json_decode(file_get_contents($filename), true);
+    return $report;
+}
+?>
+```
+
+3. 클라이언트-서버 통신 구현:
+```javascript
+async function saveReportToServer(report) {
+  try {
+    const response = await fetch('https://your-domain.com/server/api.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'save_report',
+        report: report
+      })
+    });
+    
+    const result = await response.json();
+    if (result.success) {
+      return result.id; // 저장된 보고서 ID 반환
+    } else {
+      throw new Error('Failed to save report');
+    }
+  } catch (error) {
+    console.error('Error saving report:', error);
+    return null;
+  }
+}
+```
+
+4. 보고서 공유 기능 구현:
+- 고유 URL 생성
+- 소셜 미디어 공유 버튼
+- 보고서 PDF 다운로드 옵션
+
+# Test Strategy:
+1. 서버 API 엔드포인트 기능 테스트
+2. 보고서 저장 및 불러오기 정확성 검증
+3. 오류 처리 및 예외 상황 테스트
+4. 서버 리소스 사용량 모니터링 및 최적화
+5. 보안 취약점 테스트 (입력 검증, XSS 방지 등)
+
+# Subtasks:
+## 1. Implement API Endpoints [done]
+### Dependencies: None
+### Description: Design and implement RESTful API endpoints for the server-side functionality
+### Details:
+Create PHP endpoints for user authentication, report creation, retrieval, updating, and deletion. Implement proper request validation, error handling, and response formatting. Document the API structure and expected request/response formats.
+
+## 2. Develop Report Storage System [done]
+### Dependencies: 10.1
+### Description: Create a secure and efficient system for storing and retrieving reports
+### Details:
+Implement database schema for reports storage. Create functions for CRUD operations on reports. Ensure proper data validation, sanitization, and security measures. Implement file handling for any attachments or large report data.
+
+## 3. Establish Client-Server Communication [done]
+### Dependencies: 10.1, 10.2
+### Description: Set up secure and efficient communication between client and server
+### Details:
+Implement authentication and authorization mechanisms. Set up HTTPS for secure data transfer. Create middleware for request processing. Implement rate limiting and other security measures. Test communication with various client scenarios.
+
+## 4. Implement Report Sharing Features [done]
+### Dependencies: 10.2, 10.3
+### Description: Develop functionality for users to share reports with others
+### Details:
+Create sharing permissions system. Implement user-to-user sharing functionality. Develop public/private link generation for reports. Add notification system for shared reports. Ensure proper access control and security for shared content.
+

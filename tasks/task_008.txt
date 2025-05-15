@@ -1,0 +1,105 @@
+# Task ID: 8
+# Title: 보안 분석 모듈 개발
+# Status: done
+# Dependencies: 1
+# Priority: medium
+# Description: 웹페이지의 기본적인 보안 설정 및 취약점을 분석하는 모듈 개발
+# Details:
+1. 보안 분석 클래스 구현:
+```javascript
+class SecurityAnalyzer {
+  constructor(document) {
+    this.doc = document;
+    this.results = {
+      headers: { score: 0, issues: [] },
+      contentSecurity: { score: 0, issues: [] },
+      forms: { score: 0, issues: [] },
+      links: { score: 0, issues: [] }
+    };
+  }
+
+  analyze() {
+    this.checkHTTPS();
+    this.checkContentSecurity();
+    this.checkForms();
+    this.checkExternalLinks();
+    return this.calculateScore();
+  }
+
+  checkHTTPS() {
+    // HTTPS 사용 여부 확인
+    if (window.location.protocol !== 'https:') {
+      this.results.headers.issues.push({
+        severity: 'critical',
+        message: 'HTTPS가 사용되지 않고 있습니다. 보안 연결을 위해 HTTPS로 전환하세요.'
+      });
+    }
+  }
+
+  checkForms() {
+    // 폼 보안 검사
+    const forms = this.doc.querySelectorAll('form');
+    forms.forEach((form, index) => {
+      if (form.method && form.method.toLowerCase() === 'get') {
+        // 민감한 데이터를 GET 메서드로 전송하는지 확인
+        const passwordInputs = form.querySelectorAll('input[type="password"]');
+        if (passwordInputs.length > 0) {
+          this.results.forms.issues.push({
+            severity: 'critical',
+            message: `폼 #${index+1}이 GET 메서드로 비밀번호를 전송합니다. POST 메서드를 사용하세요.`,
+            element: form.outerHTML.substring(0, 100)
+          });
+        }
+      }
+    });
+  }
+
+  // 기타 보안 검사 메서드...
+}
+```
+
+2. 주요 분석 항목:
+- HTTPS 사용 여부
+- 보안 헤더 설정 (가능한 범위 내에서)
+- 폼 보안 (method, autocomplete 속성 등)
+- 외부 링크 보안 (rel="noopener" 등)
+- 인라인 스크립트 사용 여부
+- Content Security Policy 설정
+
+3. 클라이언트 측 보안 분석의 한계 인식:
+- 서버 측 보안 설정은 분석 불가
+- 명확한 한계 안내 제공
+
+4. 개선 제안 생성 로직 구현
+
+# Test Strategy:
+1. 다양한 보안 설정의 웹사이트에서 분석 정확도 검증
+2. 일반적인 클라이언트 측 보안 취약점 감지 확인
+3. 보안 분석의 한계에 대한 명확한 안내 제공 확인
+4. 오탐지(false positive) 최소화 테스트
+
+# Subtasks:
+## 1. Implement HTTPS verification [done]
+### Dependencies: None
+### Description: Create a module to verify if the website is using HTTPS protocol and properly redirecting HTTP requests.
+### Details:
+Develop functionality to check if the website has a valid SSL certificate, properly redirects HTTP to HTTPS, and implements HSTS. Include checks for mixed content warnings and certificate validity. Document any client-side limitations in detecting certain certificate issues.
+
+## 2. Develop Content Security Policy checker [done]
+### Dependencies: 8.1
+### Description: Build a component to analyze the website's Content Security Policy implementation and identify potential vulnerabilities.
+### Details:
+Create logic to extract and parse CSP headers, evaluate policy strictness, detect unsafe directives, and recommend improvements. Include checks for missing headers and overly permissive policies. Provide clear explanations of findings with severity ratings.
+
+## 3. Create form security validation module [done]
+### Dependencies: 8.1
+### Description: Implement functionality to assess form security including CSRF protection, input validation, and secure submission methods.
+### Details:
+Develop tests to check for CSRF tokens, proper input validation attributes, autocomplete settings, and secure form submission. Include analysis of password field security and form action URLs. Note limitations in detecting server-side validation and provide appropriate disclaimers.
+
+## 4. Build external link security assessment [done]
+### Dependencies: 8.1, 8.2
+### Description: Create a component to evaluate the security of external links including proper rel attributes and destination security.
+### Details:
+Implement functionality to identify external links, verify proper use of rel='noopener noreferrer' attributes, check if destinations use HTTPS, and assess potential security risks. Include analysis of iframe sources and resource loading from external domains. Provide clear reporting on findings with remediation suggestions.
+

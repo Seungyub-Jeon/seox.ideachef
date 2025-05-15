@@ -1,0 +1,221 @@
+# Task ID: 7
+# Title: 성능 및 모바일 친화성 분석 모듈 개발
+# Status: done
+# Dependencies: 1
+# Priority: medium
+# Description: 웹페이지의 성능 지표와 모바일 친화성을 분석하는 모듈 개발
+# Details:
+1. 성능 분석 클래스 구현:
+```javascript
+class PerformanceAnalyzer {
+  constructor(document) {
+    this.doc = document;
+    this.results = {
+      resourceSize: { score: 0, issues: [] },
+      requests: { score: 0, issues: [] },
+      loadTime: { score: 0, issues: [] },
+      mediaOptimization: { score: 0, issues: [] },
+      renderingPerformance: { score: 0, issues: [] },
+      caching: { score: 0, issues: [] },
+      cdnUsage: { score: 0, issues: [] }
+    };
+    this.perfData = window.performance || {};
+  }
+
+  analyze() {
+    this.analyzeResourceSize();
+    this.analyzeRequests();
+    this.analyzeLoadTime();
+    this.analyzeMediaOptimization();
+    this.analyzeRenderingPerformance();
+    this.analyzeCaching();
+    this.analyzeCdnUsage();
+    return this.calculateScore();
+  }
+
+  analyzeResourceSize() {
+    // 리소스 크기 분석
+    if (this.perfData.getEntriesByType) {
+      const resources = this.perfData.getEntriesByType('resource');
+      // 리소스 크기 분석 로직
+    }
+  }
+
+  analyzeRenderingPerformance() {
+    // 렌더링 성능 분석 (FPS, 레이아웃 변경, 페인트 시간 등)
+  }
+
+  analyzeCaching() {
+    // 캐싱 헤더 및 전략 분석
+  }
+
+  analyzeCdnUsage() {
+    // CDN 사용 여부 및 최적화 분석
+  }
+
+  // 기타 성능 분석 메서드...
+}
+
+class MobileAnalyzer {
+  constructor(document) {
+    this.doc = document;
+    this.results = {
+      viewport: { score: 0, issues: [] },
+      touchTargets: { score: 0, issues: [] },
+      fontSizes: { score: 0, issues: [] },
+      mediaQueries: { score: 0, issues: [] },
+      responsiveDesign: { score: 0, issues: [] },
+      touchOptimization: { score: 0, issues: [] },
+      contentPriority: { score: 0, issues: [] },
+      offlineSupport: { score: 0, issues: [] }
+    };
+  }
+
+  analyze() {
+    this.checkViewport();
+    this.checkTouchTargets();
+    this.checkFontSizes();
+    this.checkMediaQueries();
+    this.checkResponsiveDesign();
+    this.checkTouchOptimization();
+    this.checkContentPriority();
+    this.checkOfflineSupport();
+    return this.calculateScore();
+  }
+
+  checkViewport() {
+    // 뷰포트 메타 태그 확인
+    const viewport = this.doc.querySelector('meta[name="viewport"]');
+    if (!viewport) {
+      this.results.viewport.issues.push({
+        severity: 'critical',
+        message: '모바일 뷰포트 메타 태그가 없습니다.'
+      });
+    }
+  }
+
+  checkResponsiveDesign() {
+    // 반응형 디자인 요소 검사 (유동적 그리드, 이미지 등)
+  }
+
+  checkTouchOptimization() {
+    // 터치 최적화 요소 검사 (제스처 지원, 터치 피드백 등)
+  }
+
+  checkContentPriority() {
+    // 모바일에서의 콘텐츠 우선순위 분석
+  }
+
+  checkOfflineSupport() {
+    // 서비스 워커, 오프라인 지원 기능 검사
+  }
+
+  // 기타 모바일 친화성 검사 메서드...
+}
+```
+
+2. 성능 분석 항목:
+- 페이지 로드 시간
+- 리소스 크기 및 요청 수
+- 이미지 최적화 상태
+- JavaScript 및 CSS 최적화
+- 캐싱 설정
+- 렌더링 성능 (FPS, 레이아웃 변경, 애니메이션 성능)
+- CDN 사용 분석 및 최적화 제안
+- 코드 분할 및 지연 로딩 분석
+
+3. 모바일 친화성 분석 항목:
+- 뷰포트 설정
+- 터치 타겟 크기
+- 가독성 (폰트 크기)
+- 미디어 쿼리 사용
+- 모바일 최적화 요소
+- 반응형 디자인 구현 상태
+- 터치 제스처 최적화
+- 모바일 콘텐츠 우선순위 분석
+- 오프라인 지원 및 서비스 워커 구현
+- 모바일 네트워크 조건 시뮬레이션
+
+4. Performance API 활용:
+- 브라우저 성능 지표 수집
+- 리소스 타이밍 분석
+- 렌더링 성능 측정
+- 네트워크 조건 시뮬레이션
+
+# Test Strategy:
+1. 다양한 성능 수준의 웹사이트에서 분석 정확도 검증
+2. 모바일 친화적/비친화적 사이트에서의 분석 정확도 테스트
+3. Performance API 지원 여부에 따른 대체 분석 방법 테스트
+4. 성능 지표의 일관성 검증
+5. 다양한 네트워크 조건(3G, 4G, WiFi)에서의 성능 분석 테스트
+6. 다양한 모바일 기기 및 화면 크기에서의 반응형 디자인 분석 테스트
+7. 오프라인 지원 기능 분석의 정확도 검증
+8. CDN 사용 분석 및 제안 기능 검증
+
+# Subtasks:
+## 1. Resource Analysis Implementation [done]
+### Dependencies: None
+### Description: Develop functionality to analyze webpage resources including JavaScript, CSS, images, and other assets to identify optimization opportunities.
+### Details:
+Implement methods to collect and analyze resource loading data using the browser's Performance API. Create metrics for resource count, size, and loading patterns. Generate recommendations for resource consolidation, minification, and elimination of render-blocking resources.
+
+## 2. Request Analysis System [done]
+### Dependencies: 7.1
+### Description: Build a system to monitor and analyze network requests to identify inefficiencies and optimization opportunities.
+### Details:
+Create functionality to track HTTP requests, analyze waterfall charts, identify unnecessary requests, and detect server response time issues. Implement recommendations for request reduction, caching strategies, and connection optimization techniques like HTTP/2 implementation.
+
+## 3. Load Time Measurement Framework [done]
+### Dependencies: 7.1, 7.2
+### Description: Develop a comprehensive framework to measure various page load metrics and user-perceived performance.
+### Details:
+Implement measurement of key metrics including Time to First Byte (TTFB), First Contentful Paint (FCP), Largest Contentful Paint (LCP), Time to Interactive (TTI), and Total Blocking Time (TBT). Create visualizations of the loading sequence and provide targeted recommendations for improving critical load paths.
+
+## 4. Media Optimization Checker [done]
+### Dependencies: 7.1
+### Description: Create functionality to analyze and provide recommendations for optimizing images, videos, and other media assets.
+### Details:
+Implement detection of unoptimized images, videos, and other media. Check for appropriate image formats (WebP, AVIF), responsive images implementation, lazy loading, and proper sizing. Provide specific recommendations for compression, format conversion, and delivery optimization for different media types.
+
+## 5. Mobile-Specific Feature Validation [done]
+### Dependencies: 7.3, 7.4
+### Description: Develop validation tools for mobile-specific features and best practices to ensure optimal mobile user experience.
+### Details:
+Implement checks for viewport configuration, touch targets size, font readability, content scaling, tap delay elimination, and mobile-friendly navigation patterns. Create a mobile emulation environment for testing and provide a comprehensive mobile-friendliness score with actionable recommendations.
+
+## 6. Rendering Performance Analysis [done]
+### Dependencies: 7.3
+### Description: Develop tools to analyze and optimize rendering performance including FPS measurement, layout shifts, and animation performance.
+### Details:
+Implement methods to track frame rates, detect layout thrashing, identify long-running JavaScript, and measure paint times. Create visualization tools for rendering performance and provide specific recommendations for optimizing the critical rendering path and reducing visual instability.
+
+## 7. Caching and CDN Analysis [done]
+### Dependencies: 7.1, 7.2
+### Description: Create functionality to analyze caching strategies and CDN usage to improve resource delivery and reduce load times.
+### Details:
+Implement detection of caching headers, cache control directives, and CDN usage patterns. Analyze cache lifetimes, identify cacheable resources that aren't being cached, and detect suboptimal CDN configurations. Provide recommendations for improved caching strategies and CDN implementation.
+
+## 8. Responsive Design Analysis [done]
+### Dependencies: 7.5
+### Description: Develop tools to comprehensively analyze responsive design implementation and provide optimization recommendations.
+### Details:
+Implement detection of responsive design patterns including fluid grids, flexible images, and appropriate media queries. Test layout behavior across various screen sizes and device orientations. Provide specific recommendations for improving responsive design implementation and fixing breakpoint issues.
+
+## 9. Touch Optimization Analysis [done]
+### Dependencies: 7.5
+### Description: Create functionality to analyze and optimize touch interactions for mobile users.
+### Details:
+Implement detection of touch gesture support, touch feedback mechanisms, and touch-friendly UI elements. Analyze touch target sizes, spacing, and positioning. Provide recommendations for improving touch interaction design and implementing touch-specific optimizations.
+
+## 10. Mobile Content Priority Analysis [done]
+### Dependencies: 7.5, 7.8
+### Description: Develop tools to analyze content prioritization for mobile users and provide optimization recommendations.
+### Details:
+Implement analysis of content hierarchy, visibility of important elements on mobile, and content adaptation across screen sizes. Detect content that may be hidden or difficult to access on mobile devices. Provide recommendations for improving content prioritization and ensuring critical content is easily accessible on mobile devices.
+
+## 11. Offline Support Analysis [done]
+### Dependencies: 7.5
+### Description: Create functionality to analyze offline capabilities and service worker implementation.
+### Details:
+Implement detection of service worker registration, offline caching strategies, and offline user experience. Analyze offline content availability and application behavior during intermittent connectivity. Provide recommendations for implementing or improving offline support through service workers and appropriate caching strategies.
+

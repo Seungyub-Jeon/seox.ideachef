@@ -1,0 +1,968 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "북마클릿 코어 구조 개발",
+      "description": "북마클릿의 기본 구조와 로더 스크립트를 구현하여 페이지 HTML을 수집하고 분석 엔진을 초기화하는 기능 개발",
+      "details": "1. 북마클릿 로더 스크립트 구현:\n```javascript\njavascript:(function(){\n  var script = document.createElement('script');\n  script.src = 'https://your-domain.com/assets/js/bookmarklet.min.js?v=' + new Date().getTime();\n  document.body.appendChild(script);\n})();\n```\n\n2. 메인 북마클릿 스크립트 구현:\n- 페이지 HTML 수집 기능\n- 분석 모듈 로딩 시스템\n- 오버레이 UI 초기화\n- 에러 핸들링 및 로깅\n\n3. 파일 구조 설정:\n- `/assets/js/bookmarklet.js` (비압축 소스)\n- `/assets/js/bookmarklet.min.js` (압축 버전)\n- `/assets/js/utils/parser.js` (HTML 파싱 유틸리티)\n\n4. 북마클릿 크기 제한 문제 해결을 위한 로더 패턴 구현",
+      "testStrategy": "1. 다양한 브라우저(Chrome, Firefox, Safari)에서 북마클릿 실행 테스트\n2. 정적 페이지와 동적 페이지(SPA)에서의 HTML 수집 정확도 검증\n3. 오류 발생 시 적절한 사용자 피드백 제공 확인\n4. 북마클릿 URL 길이 제한 내에서 작동하는지 확인",
+      "priority": "high",
+      "dependencies": [],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Design and implement the loader script",
+          "description": "Create a minimal loader script that can dynamically fetch and execute the main bookmarklet functionality",
+          "dependencies": [],
+          "details": "Develop a lightweight loader script (<2KB) that can be used as the actual bookmarklet code. It should handle cross-browser compatibility, create a namespace to avoid conflicts, and implement error handling. The loader should be able to fetch the main script from a CDN or specified location.",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Establish file structure and build process",
+          "description": "Set up the project file structure and build process to optimize the bookmarklet for production",
+          "dependencies": [
+            1
+          ],
+          "details": "Create a modular file structure that separates concerns. Implement a build process using tools like Webpack or Rollup to minify and bundle the code. Set up version control and documentation. Create a process to generate the final bookmarklet URL with the encoded JavaScript.",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Develop main script core functionality",
+          "description": "Implement the core features of the main bookmarklet script",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Develop the main script with modular architecture. Implement DOM manipulation functions, user interface components, data processing logic, and any API integrations required. Ensure the script can handle both static and dynamic page content through appropriate event listeners and observers.",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Implement size limitation solutions",
+          "description": "Address bookmarklet size limitations through optimization techniques",
+          "dependencies": [
+            2,
+            3
+          ],
+          "details": "Implement lazy loading for non-critical features. Use code splitting to load functionality on-demand. Optimize dependencies and consider using service workers for caching if appropriate. Test the bookmarklet across different browsers to ensure size limitations don't affect functionality. Document size optimization strategies for future development.\n<info added on 2025-05-15T04:14:42.681Z>\nImplement lazy loading for non-critical features. Use code splitting to load functionality on-demand. Optimize dependencies and consider using service workers for caching if appropriate. Test the bookmarklet across different browsers to ensure size limitations don't affect functionality. Document size optimization strategies for future development.\n\nThe size limitation solutions were successfully implemented with impressive results. The bookmarklet URL size was reduced from 4341 bytes to 1244 bytes, achieving a 71% reduction. A three-tier architecture was implemented consisting of a minimal loader script (644 bytes), a bootstrap module for dynamic loading, and on-demand loading of feature modules. Advanced code minification techniques were applied including custom pattern replacement, function aliasing, variable shortening, and code structure optimization. Comprehensive documentation was created covering size optimization strategies, browser compatibility tests, and a pull request template for future optimizations. The implementation is now compatible with all major browsers, including Internet Explorer's URL size limit of 2083 bytes, and testing confirmed proper functionality across Chrome, Firefox, Safari, and Edge.\n</info added on 2025-05-15T04:14:42.681Z>",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "기본 오버레이 UI 구현",
+      "description": "분석 결과를 표시할 오버레이 UI와 탭 기반 인터페이스 구현",
+      "details": "1. 오버레이 컨테이너 구현:\n```javascript\nfunction createOverlay() {\n  const overlay = document.createElement('div');\n  overlay.id = 'wa-overlay';\n  overlay.className = 'wa-overlay';\n  \n  // 오버레이 헤더 (닫기 버튼 포함)\n  const header = document.createElement('div');\n  header.className = 'wa-header';\n  \n  // 탭 컨테이너\n  const tabContainer = document.createElement('div');\n  tabContainer.className = 'wa-tabs';\n  \n  // 콘텐츠 영역\n  const contentContainer = document.createElement('div');\n  contentContainer.className = 'wa-content';\n  \n  overlay.appendChild(header);\n  overlay.appendChild(tabContainer);\n  overlay.appendChild(contentContainer);\n  \n  document.body.appendChild(overlay);\n  return overlay;\n}\n```\n\n2. 탭 인터페이스 구현:\n- SEO, 웹표준, 웹접근성, 성능, 모바일, 보안 탭 구성\n- 탭 전환 이벤트 핸들러\n\n3. 스타일시트 구현:\n- `/assets/css/overlay.css` - 오버레이 기본 스타일\n- `/assets/css/main.css` - 메인 스타일시트\n\n4. 반응형 디자인 적용:\n- 모바일 및 데스크톱 환경 모두 지원\n- 다양한 화면 크기에 대응하는 레이아웃",
+      "testStrategy": "1. 다양한 화면 크기에서 오버레이 UI 렌더링 테스트\n2. 탭 전환 기능 정상 작동 확인\n3. 오버레이가 기존 웹사이트 요소와 충돌하지 않는지 확인 (Shadow DOM 또는 격리된 스타일 적용)\n4. 닫기 버튼 및 기본 상호작용 테스트",
+      "priority": "high",
+      "dependencies": [
+        1
+      ],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Container Structure",
+          "description": "Create the basic container structure for the overlay UI",
+          "dependencies": [],
+          "details": "Develop the main overlay container with proper positioning, z-index, and basic layout. Include header, content area, and footer sections. Implement show/hide functionality with smooth transitions. Ensure the container has proper event handling for closing and interaction.\n<info added on 2025-05-15T04:31:16.786Z>\nDevelop the main overlay container with proper positioning, z-index, and basic layout. Include header, content area, and footer sections. Implement show/hide functionality with smooth transitions. Ensure the container has proper event handling for closing and interaction.\n\nThe container.js implementation is already substantially complete with the basic overlay structure. The remaining work focuses on four key areas:\n\n1. API Consistency: Review and enhance the external API (show/hide/toggle methods) to ensure consistent behavior and proper documentation for controlling the overlay from outside components.\n\n2. Accessibility Improvements: Strengthen ARIA attributes and keyboard controls for the header, close button, and tab elements to ensure the overlay is fully accessible.\n\n3. Code Refinement: Perform code refactoring and add comprehensive comments to improve maintainability and readability.\n\n4. Integration Planning: Ensure the container structure is designed with extensibility in mind to support the upcoming tab interface implementation (subtask 2.2) and responsive styling.\n\nImplementation priorities are: (1) show/hide API completion, (2) accessibility enhancements, (3) code refactoring, and (4) extensibility features. Additional verification is needed for the show/hide functions, activateTab method, and CSS integration at the bottom of container.js.\n</info added on 2025-05-15T04:31:16.786Z>",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Develop Tab Interface",
+          "description": "Create a functional tab navigation system within the overlay",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement tab buttons/controls that switch between different content panels. Include active state styling for the selected tab. Add event listeners for tab switching. Ensure proper content loading and unloading when switching tabs. Consider accessibility requirements for keyboard navigation.\n<info added on 2025-05-15T04:36:19.595Z>\nImplement tab buttons/controls that switch between different content panels. Include active state styling for the selected tab. Add event listeners for tab switching. Ensure proper content loading and unloading when switching tabs. Consider accessibility requirements for keyboard navigation.\n\n1차 개발 계획 및 점검:\n\n- 목표: 오버레이 내에서 탭 버튼/컨트롤을 구현하고, 각 탭 클릭 시 해당 콘텐츠 패널로 전환되는 기능을 완성한다.\n- 주요 구현 포인트:\n  1. 탭 버튼/컨트롤의 DOM 구조 및 클래스(active 등) 일관성 점검\n  2. 탭 클릭 이벤트 리스너 및 활성화 로직(activateTab) 보강\n  3. 탭 전환 시 콘텐츠 영역의 동적 표시/숨김 처리\n  4. 키보드 접근성(좌우 화살표, 탭 이동, ARIA role/tabindex 등) 보강\n  5. 코드/주석 정리 및 확장성 고려\n- 현재 overlay.js에 기본 탭 구조와 activateTab 함수, 클릭 이벤트가 이미 구현되어 있으나, 접근성 및 키보드 내비게이션은 미흡함\n- 우선순위: 1) DOM/이벤트 구조 점검, 2) 키보드 접근성, 3) 코드 정리 및 확장성\n\n구현 세부 계획:\n1. DOM 구조 검토 및 개선\n   - 탭 컨테이너에 role=\"tablist\" 속성 추가\n   - 각 탭 버튼에 role=\"tab\", aria-selected, aria-controls 속성 추가\n   - 각 콘텐츠 패널에 role=\"tabpanel\", aria-labelledby 속성 추가\n   - 클래스 네이밍 일관성 확보 (active, selected 등)\n\n2. 이벤트 처리 개선\n   - activateTab 함수 로직 보강 (현재 탭 비활성화, 새 탭 활성화)\n   - 이벤트 위임(delegation) 패턴 적용하여 코드 최적화\n   - 탭 전환 시 애니메이션/트랜지션 고려\n\n3. 키보드 접근성 구현\n   - 좌/우 화살표 키로 탭 간 이동 지원\n   - Home/End 키로 처음/마지막 탭으로 이동 지원\n   - 탭 키 내비게이션 순서 최적화\n   - 포커스 관리 및 시각적 포커스 표시\n\n4. 확장성 고려사항\n   - 동적으로 탭 추가/제거 가능하도록 구조화\n   - 탭 상태 변경 시 이벤트 발생 (커스텀 이벤트)\n   - 탭 콘텐츠 지연 로딩(lazy loading) 옵션 고려\n</info added on 2025-05-15T04:36:19.595Z>",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Create Stylesheet",
+          "description": "Develop comprehensive CSS styling for the overlay UI",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Create styles for all overlay components including container, tabs, content areas, and interactive elements. Implement consistent theming, typography, and spacing. Add animations for transitions between states. Ensure proper styling for active, hover, and focus states. Consider dark/light mode compatibility if needed.\n<info added on 2025-05-15T04:38:11.171Z>\nCreate styles for all overlay components including container, tabs, content areas, and interactive elements. Implement consistent theming, typography, and spacing. Add animations for transitions between states. Ensure proper styling for active, hover, and focus states. Consider dark/light mode compatibility if needed.\n\n개발 계획 및 접근 방식:\n1. CSS 구조 설계\n   - 기존 overlay.js의 인라인 스타일을 assets/css/overlay.css 파일로 분리\n   - 컴포넌트별 스타일 모듈화 (컨테이너, 탭, 콘텐츠 영역, 버튼 등)\n   - 변수 활용을 통한 테마 일관성 확보 (CSS 변수 또는 SCSS 사용 고려)\n\n2. 주요 컴포넌트 스타일링 세부 계획\n   - 컨테이너: 전체 오버레이 경계, 배경, 그림자 효과\n   - 탭 인터페이스: 탭 버튼, 활성/비활성 상태, 구분선\n   - 콘텐츠 영역: 패딩, 마진, 스크롤 처리\n   - 인터랙티브 요소: 버튼, 입력 필드, 토글 등\n\n3. 테마 일관성 요소\n   - 색상 팔레트: 주요 색상, 보조 색상, 강조 색상 정의\n   - 타이포그래피: 폰트 패밀리, 크기, 두께, 행간 표준화\n   - 간격 및 여백: 일관된 간격 시스템 적용\n   - 그림자 및 입체감: 요소별 깊이감 표현\n\n4. 상태별 스타일 및 애니메이션\n   - active, hover, focus 상태에 대한 시각적 피드백\n   - 탭 전환, 모달 표시/숨김 등의 트랜지션 효과\n   - 로딩 상태 및 상호작용 애니메이션\n\n5. 확장성 고려사항\n   - 다크/라이트 모드 전환 지원 (CSS 변수 활용)\n   - 향후 추가될 수 있는 컴포넌트 고려한 구조\n   - 브라우저 호환성 확보\n</info added on 2025-05-15T04:38:11.171Z>",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Implement Responsive Design",
+          "description": "Ensure the overlay UI works well across different screen sizes",
+          "dependencies": [
+            3
+          ],
+          "details": "Add media queries to adjust layout for mobile, tablet, and desktop viewports. Implement touch-friendly interactions for mobile devices. Test and optimize for various screen sizes and orientations. Ensure content remains accessible and usable at all breakpoints. Consider performance optimizations for mobile devices.",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "SEO 분석 모듈 개발",
+      "description": "웹페이지의 SEO 요소를 분석하는 모듈 개발 (메타 태그, 제목, 헤딩 구조, 키워드 밀도 등)",
+      "details": "1. SEO 분석 클래스 구현:\n```javascript\nclass SEOAnalyzer {\n  constructor(document) {\n    this.doc = document;\n    this.results = {\n      metaTags: { score: 0, issues: [] },\n      headings: { score: 0, issues: [] },\n      content: { score: 0, issues: [] },\n      links: { score: 0, issues: [] },\n      keywords: { score: 0, issues: [] }\n    };\n  }\n\n  analyze() {\n    this.analyzeMetaTags();\n    this.analyzeHeadings();\n    this.analyzeContent();\n    this.analyzeLinks();\n    this.analyzeKeywords();\n    return this.calculateScore();\n  }\n\n  analyzeMetaTags() {\n    // 메타 태그 분석 로직\n    const title = this.doc.querySelector('title');\n    const description = this.doc.querySelector('meta[name=\"description\"]');\n    const keywords = this.doc.querySelector('meta[name=\"keywords\"]');\n    // 분석 결과 저장\n  }\n\n  // 기타 분석 메서드...\n\n  calculateScore() {\n    // 종합 점수 계산 로직\n    return {\n      score: 0, // 계산된 점수\n      results: this.results\n    };\n  }\n}\n```\n\n2. 주요 분석 항목:\n- 메타 태그 (title, description, keywords, robots 등)\n- 헤딩 구조 및 계층\n- 이미지 최적화 (alt 텍스트, 크기 등)\n- 내부/외부 링크 구조\n- 키워드 밀도 및 배치\n- 소셜 미디어 메타 태그 (OG, Twitter 등)\n\n3. 점수 계산 알고리즘 구현:\n- 각 요소별 가중치 적용\n- 문제 심각도에 따른 점수 차감\n\n4. 개선 제안 생성 로직 구현",
+      "testStrategy": "1. 다양한 SEO 품질의 웹사이트에서 분석 정확도 검증\n2. 메타 태그 누락, 중복 제목, 잘못된 헤딩 구조 등 일반적인 SEO 문제 감지 확인\n3. 키워드 밀도 분석 정확도 테스트\n4. 점수 계산 알고리즘의 일관성 검증",
+      "priority": "high",
+      "dependencies": [
+        1
+      ],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Meta Tag Analysis Component",
+          "description": "Create a component that analyzes meta tags including title, description, and keywords for SEO optimization",
+          "dependencies": [],
+          "details": "Develop functionality to extract meta tags from webpages, evaluate their length, keyword usage, and relevance. Include checks for duplicate meta descriptions and missing meta tags. Create a scoring system for meta tag quality based on best practices.",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Develop Heading Structure Analysis Component",
+          "description": "Build a component that evaluates the heading hierarchy (H1-H6) and their SEO effectiveness",
+          "dependencies": [],
+          "details": "Create algorithms to analyze heading structure, check for proper hierarchy, keyword usage in headings, and heading distribution. Evaluate if H1 tags are unique and properly implemented. Identify missing or improperly nested headings.",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Implement Content Analysis Component",
+          "description": "Develop a component that analyzes content quality, keyword density, and readability",
+          "dependencies": [],
+          "details": "Create functionality to evaluate content length, keyword density, readability scores, and content uniqueness. Implement algorithms to detect keyword stuffing, thin content, and duplicate content issues. Include analysis of image alt tags and multimedia elements.",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Create Link Analysis Component",
+          "description": "Build a component that evaluates internal and external links, anchor texts, and link structure",
+          "dependencies": [],
+          "details": "Develop algorithms to analyze internal linking structure, broken links, external link quality, anchor text optimization, and link-to-text ratio. Include functionality to identify orphaned pages and evaluate link distribution throughout content.",
+          "status": "done"
+        },
+        {
+          "id": 5,
+          "title": "Implement Comprehensive SEO Scoring Algorithm",
+          "description": "Develop an algorithm that combines all analysis components to generate an overall SEO score",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "details": "Create a weighted scoring system that integrates results from all analysis components. Implement customizable weighting based on industry standards and best practices. Generate detailed reports with actionable recommendations for SEO improvements. Include visualization of SEO performance metrics.",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "웹표준 검증 모듈 개발",
+      "description": "HTML 유효성, 구조적 마크업, 시맨틱 태그 사용 등 웹표준 준수 여부를 분석하는 모듈 개발",
+      "details": "1. 웹표준 분석 클래스 구현:\n```javascript\nclass StandardsAnalyzer {\n  constructor(document) {\n    this.doc = document;\n    this.results = {\n      htmlValidity: { score: 0, issues: [] },\n      semanticMarkup: { score: 0, issues: [] },\n      deprecatedElements: { score: 0, issues: [] },\n      doctype: { score: 0, issues: [] }\n    };\n  }\n\n  analyze() {\n    this.checkDoctype();\n    this.checkSemanticMarkup();\n    this.checkDeprecatedElements();\n    this.checkStructure();\n    return this.calculateScore();\n  }\n\n  checkDoctype() {\n    // DOCTYPE 선언 확인\n    const doctype = this.doc.doctype;\n    if (!doctype) {\n      this.results.doctype.issues.push({\n        severity: 'critical',\n        message: 'DOCTYPE 선언이 없습니다.'\n      });\n    }\n  }\n\n  // 기타 검증 메서드...\n\n  calculateScore() {\n    // 종합 점수 계산 로직\n    return {\n      score: 0, // 계산된 점수\n      results: this.results\n    };\n  }\n}\n```\n\n2. 주요 분석 항목:\n- HTML5 DOCTYPE 선언 확인\n- 시맨틱 태그 사용 (header, nav, main, section, article, footer 등)\n- 폐기된(deprecated) 요소 및 속성 사용 확인\n- 구조적 마크업 검증\n- 중첩 오류 확인\n- 속성 값 유효성 검증\n\n3. 클라이언트 측 HTML 유효성 검사 구현:\n- 주요 HTML 규칙 위반 사항 확인\n- 구조적 오류 감지\n\n4. 개선 제안 생성 로직 구현",
+      "testStrategy": "1. 다양한 웹표준 준수 수준의 웹사이트에서 분석 정확도 검증\n2. 일반적인 웹표준 위반 사항 감지 확인 (폐기된 태그, 속성 오류 등)\n3. 시맨틱 마크업 분석 정확도 테스트\n4. 클라이언트 측 유효성 검사의 한계 인식 및 명확한 안내 제공",
+      "priority": "high",
+      "dependencies": [
+        1
+      ],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "HTML Validity Checker Component",
+          "description": "Develop a component that validates HTML against W3C standards",
+          "dependencies": [],
+          "details": "Create a module that parses HTML documents and checks for syntax errors, unclosed tags, invalid nesting, and other HTML validity issues according to W3C specifications. Implement error reporting with line numbers and suggested fixes.",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Semantic Markup Analyzer",
+          "description": "Build a component that evaluates proper usage of semantic HTML elements",
+          "dependencies": [
+            1
+          ],
+          "details": "Develop an analyzer that checks for appropriate use of semantic elements like <header>, <nav>, <main>, <article>, <section>, <aside>, and <footer>. Verify that elements are used according to their intended semantic meaning and provide recommendations for improving document semantics.",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Deprecated Elements Detector",
+          "description": "Create a component that identifies deprecated HTML elements and attributes",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement a detector that scans HTML for deprecated or obsolete elements and attributes according to HTML5 specifications. Flag elements like <font>, <center>, and attributes like 'align', 'bgcolor', etc. Provide modern alternatives for each deprecated feature detected.",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Document Structure Validator",
+          "description": "Develop a component that analyzes overall document structure and hierarchy",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Build a validator that examines document outline, heading hierarchy (h1-h6), landmark regions, and overall document structure. Check for proper nesting of elements, appropriate heading levels, and logical document flow. Generate a structural report with visualization of the document hierarchy.",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "웹접근성 점검 모듈 개발",
+      "description": "대체 텍스트, 키보드 접근성, 색상 대비, ARIA 속성 등 웹접근성 요소를 평가하는 모듈 개발",
+      "details": "1. 웹접근성 분석 클래스 구현:\n```javascript\nclass AccessibilityAnalyzer {\n  constructor(document) {\n    this.doc = document;\n    this.results = {\n      altText: { score: 0, issues: [] },\n      keyboardAccess: { score: 0, issues: [] },\n      colorContrast: { score: 0, issues: [] },\n      ariaAttributes: { score: 0, issues: [] },\n      structure: { score: 0, issues: [] }\n    };\n  }\n\n  analyze() {\n    this.checkAltText();\n    this.checkKeyboardAccess();\n    this.checkAriaAttributes();\n    this.checkHeadingStructure();\n    // 색상 대비는 CSS 분석 필요\n    return this.calculateScore();\n  }\n\n  checkAltText() {\n    // 이미지 대체 텍스트 확인\n    const images = this.doc.querySelectorAll('img');\n    images.forEach((img, index) => {\n      if (!img.hasAttribute('alt')) {\n        this.results.altText.issues.push({\n          severity: 'critical',\n          message: `이미지 #${index+1}에 대체 텍스트가 없습니다.`,\n          element: img.outerHTML.substring(0, 100)\n        });\n      }\n    });\n  }\n\n  // 기타 접근성 검사 메서드...\n\n  calculateScore() {\n    // 종합 점수 계산 로직\n    return {\n      score: 0, // 계산된 점수\n      results: this.results\n    };\n  }\n}\n```\n\n2. 주요 분석 항목:\n- 이미지 대체 텍스트 확인\n- 키보드 접근성 (tabindex, 포커스 가능 요소)\n- ARIA 속성 사용 적절성\n- 헤딩 구조 및 문서 아웃라인\n- 폼 레이블 및 접근성\n- 색상 대비 (가능한 범위 내에서)\n\n3. WCAG 2.1 지침 기반 검사 구현:\n- 주요 A, AA 수준 지침 검사\n- 위반 사항 심각도 분류\n\n4. 개선 제안 생성 로직 구현",
+      "testStrategy": "1. 다양한 접근성 수준의 웹사이트에서 분석 정확도 검증\n2. 일반적인 접근성 문제 감지 확인 (대체 텍스트 누락, 키보드 접근성 문제 등)\n3. WCAG 지침 준수 여부 테스트\n4. 클라이언트 측 접근성 검사의 한계 인식 및 명확한 안내 제공",
+      "priority": "high",
+      "dependencies": [
+        1
+      ],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Alt Text Validation Component",
+          "description": "Develop a component that checks for the presence and quality of alt text on images and other non-text content",
+          "dependencies": [],
+          "details": "Create a module that traverses the DOM to identify all images, SVGs, canvas elements, and other non-text content. Verify that alt text exists where required, is descriptive rather than generic, and isn't redundant. Implement heuristics to detect placeholder alt text (e.g., 'image', 'photo') and flag them for review. Include options to exempt decorative images with empty alt attributes.",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Keyboard Accessibility Testing Component",
+          "description": "Build a component that evaluates keyboard navigation, focus management, and keyboard traps",
+          "dependencies": [],
+          "details": "Implement functionality to test tabbing order, focus visibility, keyboard operability of interactive elements, and detection of keyboard traps. Include tests for custom widgets to ensure they follow ARIA authoring practices. Verify that all interactive elements can be accessed and operated using only a keyboard, and that focus indicators are clearly visible.",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "ARIA Attributes Verification Component",
+          "description": "Create a component that validates the correct usage of ARIA roles, states, and properties",
+          "dependencies": [],
+          "details": "Develop a module that checks for proper implementation of ARIA attributes according to WAI-ARIA specifications. Verify that elements with ARIA roles have all required attributes, detect conflicting or redundant ARIA attributes, and ensure that ARIA landmarks are used correctly. Include validation of dynamic content updates for proper use of aria-live regions and other relevant attributes.",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Heading Structure Analysis Component",
+          "description": "Implement a component that evaluates the document's heading hierarchy for proper structure and organization",
+          "dependencies": [
+            3
+          ],
+          "details": "Create functionality to analyze heading levels (h1-h6) for proper nesting and hierarchy. Check for skipped heading levels, empty headings, and multiple h1 elements (when inappropriate). Generate a document outline view to visualize the heading structure. Include recommendations for improving document structure based on best practices for screen reader navigation.",
+          "status": "done"
+        },
+        {
+          "id": 5,
+          "title": "Form Accessibility Evaluation Component",
+          "description": "Develop a component that checks form elements for proper labeling, instructions, and error handling",
+          "dependencies": [
+            2,
+            3
+          ],
+          "details": "Build a module that verifies form elements have associated labels, fieldsets and legends are used appropriately, form controls have descriptive names, error messages are properly associated with form fields, and that form validation provides clear instructions. Include checks for autocomplete attributes, appropriate input types, and that form submission can be completed using keyboard only.",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "결과 시각화 및 차트 구현",
+      "description": "분석 결과를 시각적으로 표현하는 차트, 그래프 및 점수 시각화 컴포넌트 개발",
+      "details": "1. 점수 시각화 컴포넌트 구현:\n```javascript\nfunction createScoreCard(score, category) {\n  const scoreCard = document.createElement('div');\n  scoreCard.className = 'wa-score-card';\n  \n  // 점수 표시 원형 차트\n  const scoreCircle = document.createElement('div');\n  scoreCircle.className = 'wa-score-circle';\n  scoreCircle.style.background = `conic-gradient(var(--score-color) ${score}%, transparent 0)`;\n  \n  // 점수 텍스트\n  const scoreText = document.createElement('div');\n  scoreText.className = 'wa-score-text';\n  scoreText.textContent = score;\n  \n  // 카테고리 레이블\n  const categoryLabel = document.createElement('div');\n  categoryLabel.className = 'wa-category-label';\n  categoryLabel.textContent = category;\n  \n  scoreCircle.appendChild(scoreText);\n  scoreCard.appendChild(scoreCircle);\n  scoreCard.appendChild(categoryLabel);\n  \n  return scoreCard;\n}\n```\n\n2. 차트 및 그래프 구현:\n- 레이더 차트 (전체 성능 시각화)\n- 막대 그래프 (카테고리별 점수 비교)\n- 원형 차트 (문제 유형 분포)\n- 순수 SVG 또는 Canvas 기반 구현\n\n3. 문제점 시각화:\n- 심각도별 색상 코드 (빨강-노랑-초록)\n- 문제 목록 및 필터링 UI\n- 코드 스니펫 하이라이팅\n\n4. 반응형 차트 구현:\n- 다양한 화면 크기에 맞는 차트 크기 조정\n- 모바일 환경에서의 최적화",
+      "testStrategy": "1. 다양한 점수 범위에서 차트 정확도 및 시각적 표현 검증\n2. 다양한 화면 크기에서 차트 렌더링 테스트\n3. 차트 상호작용 기능 테스트 (툴팁, 호버 효과 등)\n4. 성능 테스트 (대량의 데이터 시각화 시 렌더링 성능)",
+      "priority": "medium",
+      "dependencies": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Score Card Components",
+          "description": "Create reusable score card components that display key metrics and summary data in a clean, readable format.",
+          "dependencies": [],
+          "details": "Design and implement score card UI components that can display numerical values, trends, and status indicators. Include functionality for different card sizes, color coding based on thresholds, and optional comparison to previous periods. Ensure components are reusable across the application and follow design system guidelines.",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Develop Chart Type Components",
+          "description": "Implement radar, bar, and pie chart components with consistent styling and interaction patterns.",
+          "dependencies": [
+            1
+          ],
+          "details": "Create chart components using an appropriate visualization library. Implement radar charts for multi-dimensional data comparison, bar charts for categorical comparisons, and pie charts for part-to-whole relationships. Ensure consistent styling, tooltips, legends, and interaction behaviors across all chart types. Include options for customization of colors, labels, and animations.",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Build Issue Visualization System",
+          "description": "Create a system to visualize issues, bugs, or tasks with appropriate visual indicators for status, priority, and relationships.",
+          "dependencies": [
+            2
+          ],
+          "details": "Develop visualizations specifically for tracking and displaying issues or tasks. Include functionality for filtering, grouping, and highlighting based on various attributes. Implement visual indicators for status (open, in progress, resolved), priority levels, and relationships between issues. Create views that support both overview and detailed analysis of issue data.",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Implement Responsive Chart Adaptation",
+          "description": "Ensure all visualization components adapt appropriately to different screen sizes and device types.",
+          "dependencies": [
+            2,
+            3
+          ],
+          "details": "Add responsive behavior to all chart components to ensure optimal display across desktop, tablet, and mobile devices. Implement logic to adjust chart dimensions, labels, legends, and interaction methods based on available screen space. Create fallback visualizations for very small screens where complex charts may not be readable. Test thoroughly across multiple device types and screen orientations.",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "성능 및 모바일 친화성 분석 모듈 개발",
+      "description": "웹페이지의 성능 지표와 모바일 친화성을 분석하는 모듈 개발",
+      "status": "done",
+      "dependencies": [
+        1
+      ],
+      "priority": "medium",
+      "details": "1. 성능 분석 클래스 구현:\n```javascript\nclass PerformanceAnalyzer {\n  constructor(document) {\n    this.doc = document;\n    this.results = {\n      resourceSize: { score: 0, issues: [] },\n      requests: { score: 0, issues: [] },\n      loadTime: { score: 0, issues: [] },\n      mediaOptimization: { score: 0, issues: [] },\n      renderingPerformance: { score: 0, issues: [] },\n      caching: { score: 0, issues: [] },\n      cdnUsage: { score: 0, issues: [] }\n    };\n    this.perfData = window.performance || {};\n  }\n\n  analyze() {\n    this.analyzeResourceSize();\n    this.analyzeRequests();\n    this.analyzeLoadTime();\n    this.analyzeMediaOptimization();\n    this.analyzeRenderingPerformance();\n    this.analyzeCaching();\n    this.analyzeCdnUsage();\n    return this.calculateScore();\n  }\n\n  analyzeResourceSize() {\n    // 리소스 크기 분석\n    if (this.perfData.getEntriesByType) {\n      const resources = this.perfData.getEntriesByType('resource');\n      // 리소스 크기 분석 로직\n    }\n  }\n\n  analyzeRenderingPerformance() {\n    // 렌더링 성능 분석 (FPS, 레이아웃 변경, 페인트 시간 등)\n  }\n\n  analyzeCaching() {\n    // 캐싱 헤더 및 전략 분석\n  }\n\n  analyzeCdnUsage() {\n    // CDN 사용 여부 및 최적화 분석\n  }\n\n  // 기타 성능 분석 메서드...\n}\n\nclass MobileAnalyzer {\n  constructor(document) {\n    this.doc = document;\n    this.results = {\n      viewport: { score: 0, issues: [] },\n      touchTargets: { score: 0, issues: [] },\n      fontSizes: { score: 0, issues: [] },\n      mediaQueries: { score: 0, issues: [] },\n      responsiveDesign: { score: 0, issues: [] },\n      touchOptimization: { score: 0, issues: [] },\n      contentPriority: { score: 0, issues: [] },\n      offlineSupport: { score: 0, issues: [] }\n    };\n  }\n\n  analyze() {\n    this.checkViewport();\n    this.checkTouchTargets();\n    this.checkFontSizes();\n    this.checkMediaQueries();\n    this.checkResponsiveDesign();\n    this.checkTouchOptimization();\n    this.checkContentPriority();\n    this.checkOfflineSupport();\n    return this.calculateScore();\n  }\n\n  checkViewport() {\n    // 뷰포트 메타 태그 확인\n    const viewport = this.doc.querySelector('meta[name=\"viewport\"]');\n    if (!viewport) {\n      this.results.viewport.issues.push({\n        severity: 'critical',\n        message: '모바일 뷰포트 메타 태그가 없습니다.'\n      });\n    }\n  }\n\n  checkResponsiveDesign() {\n    // 반응형 디자인 요소 검사 (유동적 그리드, 이미지 등)\n  }\n\n  checkTouchOptimization() {\n    // 터치 최적화 요소 검사 (제스처 지원, 터치 피드백 등)\n  }\n\n  checkContentPriority() {\n    // 모바일에서의 콘텐츠 우선순위 분석\n  }\n\n  checkOfflineSupport() {\n    // 서비스 워커, 오프라인 지원 기능 검사\n  }\n\n  // 기타 모바일 친화성 검사 메서드...\n}\n```\n\n2. 성능 분석 항목:\n- 페이지 로드 시간\n- 리소스 크기 및 요청 수\n- 이미지 최적화 상태\n- JavaScript 및 CSS 최적화\n- 캐싱 설정\n- 렌더링 성능 (FPS, 레이아웃 변경, 애니메이션 성능)\n- CDN 사용 분석 및 최적화 제안\n- 코드 분할 및 지연 로딩 분석\n\n3. 모바일 친화성 분석 항목:\n- 뷰포트 설정\n- 터치 타겟 크기\n- 가독성 (폰트 크기)\n- 미디어 쿼리 사용\n- 모바일 최적화 요소\n- 반응형 디자인 구현 상태\n- 터치 제스처 최적화\n- 모바일 콘텐츠 우선순위 분석\n- 오프라인 지원 및 서비스 워커 구현\n- 모바일 네트워크 조건 시뮬레이션\n\n4. Performance API 활용:\n- 브라우저 성능 지표 수집\n- 리소스 타이밍 분석\n- 렌더링 성능 측정\n- 네트워크 조건 시뮬레이션",
+      "testStrategy": "1. 다양한 성능 수준의 웹사이트에서 분석 정확도 검증\n2. 모바일 친화적/비친화적 사이트에서의 분석 정확도 테스트\n3. Performance API 지원 여부에 따른 대체 분석 방법 테스트\n4. 성능 지표의 일관성 검증\n5. 다양한 네트워크 조건(3G, 4G, WiFi)에서의 성능 분석 테스트\n6. 다양한 모바일 기기 및 화면 크기에서의 반응형 디자인 분석 테스트\n7. 오프라인 지원 기능 분석의 정확도 검증\n8. CDN 사용 분석 및 제안 기능 검증",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Resource Analysis Implementation",
+          "description": "Develop functionality to analyze webpage resources including JavaScript, CSS, images, and other assets to identify optimization opportunities.",
+          "dependencies": [],
+          "details": "Implement methods to collect and analyze resource loading data using the browser's Performance API. Create metrics for resource count, size, and loading patterns. Generate recommendations for resource consolidation, minification, and elimination of render-blocking resources.",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Request Analysis System",
+          "description": "Build a system to monitor and analyze network requests to identify inefficiencies and optimization opportunities.",
+          "dependencies": [
+            1
+          ],
+          "details": "Create functionality to track HTTP requests, analyze waterfall charts, identify unnecessary requests, and detect server response time issues. Implement recommendations for request reduction, caching strategies, and connection optimization techniques like HTTP/2 implementation.",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Load Time Measurement Framework",
+          "description": "Develop a comprehensive framework to measure various page load metrics and user-perceived performance.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implement measurement of key metrics including Time to First Byte (TTFB), First Contentful Paint (FCP), Largest Contentful Paint (LCP), Time to Interactive (TTI), and Total Blocking Time (TBT). Create visualizations of the loading sequence and provide targeted recommendations for improving critical load paths.",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Media Optimization Checker",
+          "description": "Create functionality to analyze and provide recommendations for optimizing images, videos, and other media assets.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement detection of unoptimized images, videos, and other media. Check for appropriate image formats (WebP, AVIF), responsive images implementation, lazy loading, and proper sizing. Provide specific recommendations for compression, format conversion, and delivery optimization for different media types.",
+          "status": "done"
+        },
+        {
+          "id": 5,
+          "title": "Mobile-Specific Feature Validation",
+          "description": "Develop validation tools for mobile-specific features and best practices to ensure optimal mobile user experience.",
+          "dependencies": [
+            3,
+            4
+          ],
+          "details": "Implement checks for viewport configuration, touch targets size, font readability, content scaling, tap delay elimination, and mobile-friendly navigation patterns. Create a mobile emulation environment for testing and provide a comprehensive mobile-friendliness score with actionable recommendations.",
+          "status": "done"
+        },
+        {
+          "id": 6,
+          "title": "Rendering Performance Analysis",
+          "description": "Develop tools to analyze and optimize rendering performance including FPS measurement, layout shifts, and animation performance.",
+          "dependencies": [
+            3
+          ],
+          "details": "Implement methods to track frame rates, detect layout thrashing, identify long-running JavaScript, and measure paint times. Create visualization tools for rendering performance and provide specific recommendations for optimizing the critical rendering path and reducing visual instability.",
+          "status": "done"
+        },
+        {
+          "id": 7,
+          "title": "Caching and CDN Analysis",
+          "description": "Create functionality to analyze caching strategies and CDN usage to improve resource delivery and reduce load times.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implement detection of caching headers, cache control directives, and CDN usage patterns. Analyze cache lifetimes, identify cacheable resources that aren't being cached, and detect suboptimal CDN configurations. Provide recommendations for improved caching strategies and CDN implementation.",
+          "status": "done"
+        },
+        {
+          "id": 8,
+          "title": "Responsive Design Analysis",
+          "description": "Develop tools to comprehensively analyze responsive design implementation and provide optimization recommendations.",
+          "dependencies": [
+            5
+          ],
+          "details": "Implement detection of responsive design patterns including fluid grids, flexible images, and appropriate media queries. Test layout behavior across various screen sizes and device orientations. Provide specific recommendations for improving responsive design implementation and fixing breakpoint issues.",
+          "status": "done"
+        },
+        {
+          "id": 9,
+          "title": "Touch Optimization Analysis",
+          "description": "Create functionality to analyze and optimize touch interactions for mobile users.",
+          "dependencies": [
+            5
+          ],
+          "details": "Implement detection of touch gesture support, touch feedback mechanisms, and touch-friendly UI elements. Analyze touch target sizes, spacing, and positioning. Provide recommendations for improving touch interaction design and implementing touch-specific optimizations.",
+          "status": "done"
+        },
+        {
+          "id": 10,
+          "title": "Mobile Content Priority Analysis",
+          "description": "Develop tools to analyze content prioritization for mobile users and provide optimization recommendations.",
+          "dependencies": [
+            5,
+            8
+          ],
+          "details": "Implement analysis of content hierarchy, visibility of important elements on mobile, and content adaptation across screen sizes. Detect content that may be hidden or difficult to access on mobile devices. Provide recommendations for improving content prioritization and ensuring critical content is easily accessible on mobile devices.",
+          "status": "done"
+        },
+        {
+          "id": 11,
+          "title": "Offline Support Analysis",
+          "description": "Create functionality to analyze offline capabilities and service worker implementation.",
+          "dependencies": [
+            5
+          ],
+          "details": "Implement detection of service worker registration, offline caching strategies, and offline user experience. Analyze offline content availability and application behavior during intermittent connectivity. Provide recommendations for implementing or improving offline support through service workers and appropriate caching strategies.",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "보안 분석 모듈 개발",
+      "description": "웹페이지의 기본적인 보안 설정 및 취약점을 분석하는 모듈 개발",
+      "details": "1. 보안 분석 클래스 구현:\n```javascript\nclass SecurityAnalyzer {\n  constructor(document) {\n    this.doc = document;\n    this.results = {\n      headers: { score: 0, issues: [] },\n      contentSecurity: { score: 0, issues: [] },\n      forms: { score: 0, issues: [] },\n      links: { score: 0, issues: [] }\n    };\n  }\n\n  analyze() {\n    this.checkHTTPS();\n    this.checkContentSecurity();\n    this.checkForms();\n    this.checkExternalLinks();\n    return this.calculateScore();\n  }\n\n  checkHTTPS() {\n    // HTTPS 사용 여부 확인\n    if (window.location.protocol !== 'https:') {\n      this.results.headers.issues.push({\n        severity: 'critical',\n        message: 'HTTPS가 사용되지 않고 있습니다. 보안 연결을 위해 HTTPS로 전환하세요.'\n      });\n    }\n  }\n\n  checkForms() {\n    // 폼 보안 검사\n    const forms = this.doc.querySelectorAll('form');\n    forms.forEach((form, index) => {\n      if (form.method && form.method.toLowerCase() === 'get') {\n        // 민감한 데이터를 GET 메서드로 전송하는지 확인\n        const passwordInputs = form.querySelectorAll('input[type=\"password\"]');\n        if (passwordInputs.length > 0) {\n          this.results.forms.issues.push({\n            severity: 'critical',\n            message: `폼 #${index+1}이 GET 메서드로 비밀번호를 전송합니다. POST 메서드를 사용하세요.`,\n            element: form.outerHTML.substring(0, 100)\n          });\n        }\n      }\n    });\n  }\n\n  // 기타 보안 검사 메서드...\n}\n```\n\n2. 주요 분석 항목:\n- HTTPS 사용 여부\n- 보안 헤더 설정 (가능한 범위 내에서)\n- 폼 보안 (method, autocomplete 속성 등)\n- 외부 링크 보안 (rel=\"noopener\" 등)\n- 인라인 스크립트 사용 여부\n- Content Security Policy 설정\n\n3. 클라이언트 측 보안 분석의 한계 인식:\n- 서버 측 보안 설정은 분석 불가\n- 명확한 한계 안내 제공\n\n4. 개선 제안 생성 로직 구현",
+      "testStrategy": "1. 다양한 보안 설정의 웹사이트에서 분석 정확도 검증\n2. 일반적인 클라이언트 측 보안 취약점 감지 확인\n3. 보안 분석의 한계에 대한 명확한 안내 제공 확인\n4. 오탐지(false positive) 최소화 테스트",
+      "priority": "medium",
+      "dependencies": [
+        1
+      ],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement HTTPS verification",
+          "description": "Create a module to verify if the website is using HTTPS protocol and properly redirecting HTTP requests.",
+          "dependencies": [],
+          "details": "Develop functionality to check if the website has a valid SSL certificate, properly redirects HTTP to HTTPS, and implements HSTS. Include checks for mixed content warnings and certificate validity. Document any client-side limitations in detecting certain certificate issues.",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Develop Content Security Policy checker",
+          "description": "Build a component to analyze the website's Content Security Policy implementation and identify potential vulnerabilities.",
+          "dependencies": [
+            1
+          ],
+          "details": "Create logic to extract and parse CSP headers, evaluate policy strictness, detect unsafe directives, and recommend improvements. Include checks for missing headers and overly permissive policies. Provide clear explanations of findings with severity ratings.",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Create form security validation module",
+          "description": "Implement functionality to assess form security including CSRF protection, input validation, and secure submission methods.",
+          "dependencies": [
+            1
+          ],
+          "details": "Develop tests to check for CSRF tokens, proper input validation attributes, autocomplete settings, and secure form submission. Include analysis of password field security and form action URLs. Note limitations in detecting server-side validation and provide appropriate disclaimers.",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Build external link security assessment",
+          "description": "Create a component to evaluate the security of external links including proper rel attributes and destination security.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implement functionality to identify external links, verify proper use of rel='noopener noreferrer' attributes, check if destinations use HTTPS, and assess potential security risks. Include analysis of iframe sources and resource loading from external domains. Provide clear reporting on findings with remediation suggestions.",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "종합 보고서 생성 모듈 개발",
+      "description": "모든 분석 결과를 종합하여 전체 점수를 계산하고 우선순위가 지정된 개선 제안을 생성하는 모듈 개발",
+      "details": "1. 보고서 생성 클래스 구현:\n```javascript\nclass ReportGenerator {\n  constructor(results) {\n    this.results = results; // 각 분석 모듈의 결과\n    this.report = {\n      meta: {\n        url: window.location.href,\n        title: document.title,\n        datetime: new Date().toISOString(),\n        version: '1.0.0'\n      },\n      scores: {},\n      summary: {\n        issues_count: {\n          critical: 0,\n          major: 0,\n          minor: 0,\n          info: 0\n        },\n        top_issues: []\n      },\n      categories: {},\n      recommendations: []\n    };\n  }\n\n  generate() {\n    this.calculateScores();\n    this.summarizeIssues();\n    this.generateRecommendations();\n    return this.report;\n  }\n\n  calculateScores() {\n    // 각 카테고리 및 전체 점수 계산\n    const categories = Object.keys(this.results);\n    let totalScore = 0;\n    \n    categories.forEach(category => {\n      this.report.scores[category] = this.results[category].score;\n      this.report.categories[category] = this.results[category];\n      totalScore += this.results[category].score;\n    });\n    \n    this.report.scores.overall = Math.round(totalScore / categories.length);\n  }\n\n  // 기타 보고서 생성 메서드...\n}\n```\n\n2. 주요 기능:\n- 전체 점수 계산 알고리즘 구현\n- 카테고리별 점수 통합\n- 문제점 심각도별 분류 및 집계\n- 우선순위가 지정된 개선 제안 생성\n- 상위 문제점 추출 및 요약\n\n3. 보고서 JSON 구조 구현:\n- PRD에 명시된 보고서 구조 준수\n- 확장 가능한 구조 설계\n\n4. 개선 제안 우선순위 지정 로직:\n- 문제 심각도, 수정 용이성, 영향도 기반\n- 실행 가능한 구체적 제안 생성",
+      "testStrategy": "1. 다양한 분석 결과 조합에서 보고서 생성 정확도 검증\n2. 점수 계산 알고리즘의 일관성 테스트\n3. 개선 제안의 실행 가능성 및 구체성 검증\n4. 보고서 JSON 구조의 유효성 검증",
+      "priority": "medium",
+      "dependencies": [
+        3,
+        4,
+        5,
+        7,
+        8
+      ],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Score Calculation Algorithms",
+          "description": "Develop algorithms to calculate overall and category-specific scores based on analysis results",
+          "dependencies": [],
+          "details": "Create mathematical models to normalize and weight different metrics from various analysis modules. Implement algorithms that can handle different data types and produce consistent, meaningful scores. Include validation mechanisms to ensure score accuracy and reliability.",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Develop Issue Summarization Logic",
+          "description": "Create logic to identify, categorize, and summarize key issues from analysis results",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement natural language processing techniques to extract and summarize critical issues. Design classification systems to categorize issues by severity, type, and impact. Create templates for consistent issue description formatting that balances technical accuracy with readability.",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Create Recommendation Prioritization System",
+          "description": "Develop a system to prioritize and present actionable recommendations based on issue severity and impact",
+          "dependencies": [
+            2
+          ],
+          "details": "Implement algorithms to rank recommendations by potential impact, implementation difficulty, and urgency. Create a framework for generating specific, actionable recommendations tied to identified issues. Design a system that can adapt recommendations based on user context and constraints.",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Design and Implement Report Structure",
+          "description": "Create the overall report structure and integration mechanisms for all components",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "Design a modular report template with sections for executive summary, detailed findings, recommendations, and supporting data. Implement data visualization components to effectively communicate complex information. Create export functionality for different formats (PDF, HTML, etc.) while maintaining report integrity and readability.",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "서버 측 기능 및 보고서 저장 구현",
+      "description": "PHP 기반 서버 측 기능 개발 및 보고서 저장, 공유 기능 구현",
+      "details": "1. 서버 측 API 엔드포인트 구현:\n```php\n<?php\n// api.php\nheader('Content-Type: application/json');\nheader('Access-Control-Allow-Origin: *');\nheader('Access-Control-Allow-Methods: GET, POST, OPTIONS');\nheader('Access-Control-Allow-Headers: Content-Type');\n\n// 요청 메서드 확인\n$method = $_SERVER['REQUEST_METHOD'];\n\nif ($method === 'OPTIONS') {\n    exit(0);\n}\n\n// 요청 처리\nif ($method === 'POST') {\n    $data = json_decode(file_get_contents('php://input'), true);\n    $action = isset($data['action']) ? $data['action'] : '';\n    \n    switch ($action) {\n        case 'save_report':\n            include_once 'lib/db.php';\n            $result = saveReport($data['report']);\n            echo json_encode(['success' => $result['success'], 'id' => $result['id']]);\n            break;\n            \n        case 'analyze':\n            include_once 'lib/analyzer.php';\n            $result = performServerAnalysis($data['url']);\n            echo json_encode($result);\n            break;\n            \n        default:\n            echo json_encode(['error' => 'Unknown action']);\n    }\n} else if ($method === 'GET') {\n    $action = isset($_GET['action']) ? $_GET['action'] : '';\n    \n    switch ($action) {\n        case 'get_report':\n            include_once 'lib/db.php';\n            $id = isset($_GET['id']) ? $_GET['id'] : '';\n            $result = getReport($id);\n            echo json_encode($result);\n            break;\n            \n        default:\n            echo json_encode(['error' => 'Unknown action']);\n    }\n}\n?>\n```\n\n2. 보고서 저장 및 불러오기 기능:\n```php\n<?php\n// lib/db.php\nfunction saveReport($report) {\n    $id = uniqid();\n    $filename = '../data/reports/' . $id . '.json';\n    \n    // 디렉토리 확인 및 생성\n    if (!file_exists('../data/reports/')) {\n        mkdir('../data/reports/', 0755, true);\n    }\n    \n    // 보고서 저장\n    $success = file_put_contents($filename, json_encode($report));\n    \n    return [\n        'success' => $success !== false,\n        'id' => $id\n    ];\n}\n\nfunction getReport($id) {\n    $filename = '../data/reports/' . $id . '.json';\n    \n    if (!file_exists($filename)) {\n        return ['error' => 'Report not found'];\n    }\n    \n    $report = json_decode(file_get_contents($filename), true);\n    return $report;\n}\n?>\n```\n\n3. 클라이언트-서버 통신 구현:\n```javascript\nasync function saveReportToServer(report) {\n  try {\n    const response = await fetch('https://your-domain.com/server/api.php', {\n      method: 'POST',\n      headers: {\n        'Content-Type': 'application/json'\n      },\n      body: JSON.stringify({\n        action: 'save_report',\n        report: report\n      })\n    });\n    \n    const result = await response.json();\n    if (result.success) {\n      return result.id; // 저장된 보고서 ID 반환\n    } else {\n      throw new Error('Failed to save report');\n    }\n  } catch (error) {\n    console.error('Error saving report:', error);\n    return null;\n  }\n}\n```\n\n4. 보고서 공유 기능 구현:\n- 고유 URL 생성\n- 소셜 미디어 공유 버튼\n- 보고서 PDF 다운로드 옵션",
+      "testStrategy": "1. 서버 API 엔드포인트 기능 테스트\n2. 보고서 저장 및 불러오기 정확성 검증\n3. 오류 처리 및 예외 상황 테스트\n4. 서버 리소스 사용량 모니터링 및 최적화\n5. 보안 취약점 테스트 (입력 검증, XSS 방지 등)",
+      "priority": "low",
+      "dependencies": [
+        9
+      ],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement API Endpoints",
+          "description": "Design and implement RESTful API endpoints for the server-side functionality",
+          "dependencies": [],
+          "details": "Create PHP endpoints for user authentication, report creation, retrieval, updating, and deletion. Implement proper request validation, error handling, and response formatting. Document the API structure and expected request/response formats.",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Develop Report Storage System",
+          "description": "Create a secure and efficient system for storing and retrieving reports",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement database schema for reports storage. Create functions for CRUD operations on reports. Ensure proper data validation, sanitization, and security measures. Implement file handling for any attachments or large report data.",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Establish Client-Server Communication",
+          "description": "Set up secure and efficient communication between client and server",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implement authentication and authorization mechanisms. Set up HTTPS for secure data transfer. Create middleware for request processing. Implement rate limiting and other security measures. Test communication with various client scenarios.",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Implement Report Sharing Features",
+          "description": "Develop functionality for users to share reports with others",
+          "dependencies": [
+            2,
+            3
+          ],
+          "details": "Create sharing permissions system. Implement user-to-user sharing functionality. Develop public/private link generation for reports. Add notification system for shared reports. Ensure proper access control and security for shared content.",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Task #11: Social Media Optimization Module Development",
+      "description": "Develop a comprehensive social media optimization module that analyzes Open Graph and Twitter Card tags, verifies meta tag quality, optimizes sharing functionality, and validates preview images as specified in PRD sections 1.2 and 7.",
+      "details": "This task involves creating a module that integrates with the existing bookmarklet core structure (Task 1) to analyze and optimize social media presence on web pages. The implementation should include:\n\n1. **Open Graph Tag Analysis**:\n   - Detect and validate og:title, og:description, og:image, og:url tags\n   - Check for proper formatting and content quality\n   - Identify missing required Open Graph tags\n   - Analyze character length and content relevance\n\n2. **Twitter Card Tag Analysis**:\n   - Detect and validate twitter:card, twitter:title, twitter:description, twitter:image tags\n   - Verify proper implementation of Twitter card types\n   - Check for fallback to Open Graph tags when Twitter-specific tags are missing\n\n3. **Social Media Preview Verification**:\n   - Validate image dimensions for optimal display across platforms\n   - Check image loading speed and file size\n   - Verify image relevance to page content\n   - Test image appearance in social media preview simulators\n\n4. **Sharing Functionality Optimization**:\n   - Analyze URL structure for sharing compatibility\n   - Verify proper encoding of sharing URLs\n   - Check for presence of sharing buttons and their functionality\n   - Test custom sharing messages and their appearance\n\n5. **Integration Requirements**:\n   - The module should leverage the bookmarklet core structure from Task 1\n   - Implement non-blocking analysis to maintain performance\n   - Create a reporting interface to display findings\n   - Provide actionable recommendations for improvements\n\nThe module should be configurable to focus on specific platforms (Facebook, Twitter, LinkedIn, etc.) and should generate a comprehensive report highlighting issues and optimization opportunities.",
+      "testStrategy": "Testing for the Social Media Optimization Module should follow these approaches:\n\n1. **Unit Testing**:\n   - Create unit tests for each tag detection and validation function\n   - Test edge cases with missing, malformed, and oversized tags\n   - Verify proper handling of non-standard implementations\n   - Test tag extraction from various HTML structures\n\n2. **Integration Testing**:\n   - Verify proper integration with the bookmarklet core structure\n   - Test the module's performance impact on page loading\n   - Ensure non-blocking analysis doesn't interfere with user experience\n   - Validate correct data flow between components\n\n3. **Functional Testing**:\n   - Create a test suite with sample pages containing various social media tag configurations\n   - Test against pages with no social media tags\n   - Test against pages with incomplete tag sets\n   - Test against pages with optimal tag implementations\n   - Verify detection of oversized images or descriptions\n\n4. **Platform-specific Testing**:\n   - Use Facebook's Sharing Debugger to verify Open Graph tag detection matches\n   - Use Twitter's Card Validator to verify Twitter Card detection matches\n   - Compare module results with LinkedIn and other platform preview tools\n   - Verify recommendations align with current platform best practices\n\n5. **User Acceptance Testing**:\n   - Create a demo environment with the reporting interface\n   - Verify actionable recommendations are clear and implementable\n   - Test the module against real-world websites with varying levels of social media optimization\n   - Gather feedback on report clarity and recommendation quality\n\n6. **Performance Testing**:\n   - Measure analysis time on pages with varying complexity\n   - Verify memory usage remains within acceptable limits\n   - Test on low-bandwidth connections to ensure usability\n\nSuccess criteria include accurate detection of all specified tag types, proper validation against platform requirements, clear reporting of issues, and actionable optimization recommendations that align with PRD specifications.",
+      "status": "done",
+      "dependencies": [
+        1
+      ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Open Graph Tag Analysis Component",
+          "description": "Create a component that detects, validates, and analyzes Open Graph meta tags on web pages to ensure proper social media sharing on platforms like Facebook and LinkedIn.",
+          "dependencies": [],
+          "details": "Develop a JavaScript module that: 1) Extracts all og: meta tags from the page's head section, 2) Validates the presence and format of required tags (og:title, og:description, og:image, og:url), 3) Analyzes content quality including character length, image dimensions, and relevance, 4) Creates a data structure to store findings and recommendations. The component should handle edge cases like missing tags and improperly formatted values.",
+          "status": "done",
+          "testStrategy": "Test with pages containing various combinations of valid/invalid/missing Open Graph tags. Verify detection accuracy against Facebook's sharing debugger tool results."
+        },
+        {
+          "id": 2,
+          "title": "Implement Twitter Card Tag Analysis Component",
+          "description": "Create a component that detects, validates, and analyzes Twitter Card meta tags to ensure optimal sharing appearance on Twitter.",
+          "dependencies": [
+            1
+          ],
+          "details": "Develop a JavaScript module that: 1) Extracts all twitter: meta tags from the page, 2) Validates the presence and format of required tags based on the specified card type (twitter:card, twitter:title, twitter:description, twitter:image), 3) Verifies proper implementation of Twitter card types, 4) Checks for fallback to Open Graph tags when Twitter-specific tags are missing, 5) Creates a data structure to store findings and recommendations. The component should integrate with the Open Graph analysis to avoid duplicate work.",
+          "status": "done",
+          "testStrategy": "Test with pages using different Twitter card types (summary, summary_large_image, etc.) and verify detection against Twitter's Card Validator tool results."
+        },
+        {
+          "id": 3,
+          "title": "Develop Social Media Preview Image Verification",
+          "description": "Create functionality to validate social media preview images for optimal display across platforms, checking dimensions, file size, loading speed, and relevance.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implement a module that: 1) Extracts image URLs from og:image and twitter:image tags, 2) Loads images to verify accessibility and measure loading time, 3) Analyzes image dimensions against platform-specific recommendations (1200x630px for Facebook, 1200x675px for Twitter, etc.), 4) Checks file size and format optimization, 5) Provides specific recommendations for image improvements. Include handling for multiple image formats and responsive image specifications.",
+          "status": "done",
+          "testStrategy": "Test with various image sizes, formats, and loading scenarios. Compare results with actual previews generated on social platforms."
+        },
+        {
+          "id": 4,
+          "title": "Implement Sharing Functionality Analysis",
+          "description": "Create a component that analyzes URL structure, sharing buttons, and custom sharing messages for optimal social media sharing functionality.",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "Develop functionality that: 1) Analyzes URL structure for sharing compatibility (length, special characters, parameters), 2) Detects and tests sharing buttons present on the page, 3) Verifies proper encoding of sharing URLs, 4) Analyzes custom sharing messages if present, 5) Tests the appearance of shared content using the previously analyzed meta tags. The module should identify potential issues that could prevent proper sharing across platforms.",
+          "status": "done",
+          "testStrategy": "Test with various URL structures, sharing button implementations, and custom sharing configurations. Verify results against actual sharing behavior on major platforms."
+        },
+        {
+          "id": 5,
+          "title": "Integrate Social Media Optimization Module with Bookmarklet Core",
+          "description": "Integrate all social media analysis components into a cohesive module that works with the bookmarklet core structure, including a reporting interface with actionable recommendations.",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "details": "Create the main module that: 1) Integrates all previous components into a unified social media optimization module, 2) Implements non-blocking analysis to maintain performance, 3) Develops a user-friendly reporting interface showing findings from all components, 4) Provides actionable recommendations prioritized by impact, 5) Allows configuration to focus on specific platforms, 6) Integrates with the bookmarklet core structure from Task 1. The module should handle all error cases gracefully and provide clear guidance for users to improve their social media optimization.",
+          "status": "done",
+          "testStrategy": "Perform end-to-end testing with various websites to ensure all components work together correctly. Test performance impact and verify the accuracy of recommendations against platform best practices."
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Task #12: Internationalization and Localization Module Development",
+      "description": "Develop a comprehensive internationalization and localization module that analyzes language settings, validates character encoding, detects localized content, and evaluates multi-language support on web pages.",
+      "details": "This task involves creating a module that integrates with the bookmarklet core structure (Task #1) to analyze internationalization and localization aspects of web pages. The implementation should include:\n\n1. Language Detection:\n   - Parse HTML lang attributes from the document and its elements\n   - Detect language switching mechanisms and language selection options\n   - Identify content in multiple languages within the same page\n\n2. Character Encoding Analysis:\n   - Validate proper character encoding declarations (meta charset, Content-Type headers)\n   - Check for encoding inconsistencies or potential display issues\n   - Identify potential character rendering problems\n\n3. Localization Feature Detection:\n   - Analyze date/time formats used throughout the page\n   - Identify number formatting patterns (decimal separators, thousand separators)\n   - Detect currency formats and symbols\n   - Recognize region-specific content adaptations\n\n4. Multi-language Support Evaluation:\n   - Check for language-specific URLs or subdomains\n   - Identify content translation mechanisms\n   - Evaluate RTL (Right-to-Left) language support\n\n5. Reporting:\n   - Generate a comprehensive report on internationalization readiness\n   - Provide recommendations for improving global accessibility\n   - Highlight potential localization issues or inconsistencies\n\nThe module should be designed with extensibility in mind, allowing for future additions of region-specific checks. It should align with section 8 of the PRD regarding internationalization and localization features.",
+      "testStrategy": "Testing for the internationalization and localization module should include:\n\n1. Unit Tests:\n   - Create tests for each detection function (language detection, encoding validation, etc.)\n   - Test with various HTML inputs containing different language attributes and encodings\n   - Verify correct identification of date/time formats, number formats, and currency symbols\n\n2. Integration Tests:\n   - Test integration with the bookmarklet core structure (Task #1)\n   - Verify proper data collection and analysis pipeline\n   - Ensure the module correctly accesses and processes the page HTML\n\n3. Multilingual Test Cases:\n   - Create test pages with content in multiple languages\n   - Test with pages that use different character sets (Latin, Cyrillic, CJK, etc.)\n   - Verify detection of RTL languages and proper analysis\n\n4. Edge Cases:\n   - Test with pages that have mixed language content\n   - Test with incorrectly encoded pages to verify error handling\n   - Test with region-specific formatting variations\n\n5. Manual Verification:\n   - Test on real-world multilingual websites\n   - Verify results against known internationalization patterns\n   - Compare detection results with browser's language and encoding settings\n\n6. Performance Testing:\n   - Measure execution time on complex multilingual pages\n   - Ensure the module doesn't significantly impact overall bookmarklet performance\n\n7. Acceptance Criteria:\n   - Module correctly identifies at least 95% of language settings\n   - All major character encodings are properly detected\n   - Date/time, number, and currency formats are accurately identified\n   - Report generation is complete and provides actionable insights",
+      "status": "done",
+      "dependencies": [
+        1
+      ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Language Detection and Analysis",
+          "description": "Create a module component that detects and analyzes language settings and multilingual content on web pages.",
+          "dependencies": [],
+          "details": "Implement functions to: 1) Extract and parse HTML lang attributes from document and elements using DOM traversal, 2) Detect language switching mechanisms by identifying language selection UI elements, 3) Create an algorithm to identify content in multiple languages by analyzing text patterns and language-specific characters, 4) Generate a structured data object containing all language-related findings. Use the Language Detection API or language detection libraries if appropriate.",
+          "status": "done",
+          "testStrategy": "Test with multilingual pages containing mixed language content, pages with explicit lang attributes, and pages with language selection mechanisms. Verify detection accuracy against known language content."
+        },
+        {
+          "id": 2,
+          "title": "Develop Character Encoding Analysis Component",
+          "description": "Build a component that validates character encoding declarations and identifies potential encoding issues.",
+          "dependencies": [],
+          "details": "Implement functions to: 1) Extract and validate meta charset tags and Content-Type headers, 2) Check for encoding inconsistencies by comparing declared encoding with actual content encoding, 3) Identify potential character rendering problems by scanning for problematic character sequences or encoding mismatches, 4) Create detection algorithms for common encoding issues like mojibake or garbled text. Use TextDecoder API for encoding validation where appropriate.",
+          "status": "done",
+          "testStrategy": "Test with pages using various character encodings (UTF-8, ISO-8859-1, etc.), pages with encoding mismatches, and pages containing special characters from different writing systems."
+        },
+        {
+          "id": 3,
+          "title": "Create Localization Feature Detection System",
+          "description": "Develop a system to analyze and detect localization features including date/time formats, number formatting, and region-specific content.",
+          "dependencies": [],
+          "details": "Implement functions to: 1) Analyze date/time formats by identifying date patterns in text content, 2) Detect number formatting patterns including decimal and thousand separators, 3) Recognize currency formats and symbols through regex pattern matching, 4) Identify region-specific content adaptations by analyzing content variations. Create a comprehensive pattern library for different regional formats to support detection algorithms.",
+          "status": "done",
+          "testStrategy": "Test with pages containing various date formats (MM/DD/YYYY, DD/MM/YYYY, etc.), different number formats (1,000.00 vs 1.000,00), multiple currency symbols, and region-specific content variations."
+        },
+        {
+          "id": 4,
+          "title": "Build Multi-language Support Evaluation Module",
+          "description": "Develop a module to evaluate a website's multi-language infrastructure and RTL language support.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement functions to: 1) Analyze URL patterns to detect language-specific URLs or subdomains, 2) Identify content translation mechanisms like translation APIs or content switching, 3) Evaluate RTL language support by checking for dir attributes, CSS properties like text-align:right, and RTL-specific layouts, 4) Create algorithms to detect hreflang tags and language-specific metadata. Implement heuristics to determine if a site uses content negotiation for language selection.",
+          "status": "done",
+          "testStrategy": "Test with multilingual websites using different approaches (subdomains, path prefixes, query parameters), sites with RTL language support, and sites using various translation mechanisms."
+        },
+        {
+          "id": 5,
+          "title": "Develop Comprehensive Reporting and Integration System",
+          "description": "Create a reporting system that integrates all internationalization findings and provides actionable recommendations.",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "details": "Implement functions to: 1) Aggregate data from all previous modules into a unified data structure, 2) Generate a comprehensive report on internationalization readiness with severity levels for issues, 3) Provide specific recommendations for improving global accessibility based on detected issues, 4) Highlight potential localization inconsistencies with examples, 5) Integrate with the bookmarklet core structure from Task #1 to display results in the UI. Include extensibility points for adding future region-specific checks.",
+          "status": "done",
+          "testStrategy": "Test the integration with the core bookmarklet structure, verify that all collected data is properly displayed, and ensure recommendations are appropriate for the detected issues. Test with a variety of websites having different internationalization approaches."
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "title": "Task #13: Core Web Vitals Analysis Module Development",
+      "description": "Develop a module that analyzes and measures Core Web Vitals metrics (LCP, FID, CLS) as specified in PRD sections 4.3 and 1.7, with components to estimate metrics, identify affecting elements, and provide optimization recommendations.",
+      "details": "This task involves implementing a comprehensive Core Web Vitals analysis module that integrates with the existing bookmarklet core structure (Task #1) and extends the performance analysis module (Task #7).\n\nKey implementation components:\n1. Metric measurement implementation:\n   - Largest Contentful Paint (LCP): Track and measure the render time of the largest content element visible within the viewport\n   - First Input Delay (FID): Measure the time from when a user first interacts with the page to when the browser is able to respond to that interaction\n   - Cumulative Layout Shift (CLS): Calculate the sum of all individual layout shift scores for unexpected layout shifts during the page lifecycle\n\n2. Element identification system:\n   - Develop algorithms to identify specific DOM elements contributing to poor Core Web Vitals scores\n   - Create visual highlighting mechanisms to pinpoint problematic elements directly on the analyzed page\n   - Implement element attribution to connect metrics with specific page components\n\n3. Recommendation engine:\n   - Create a rule-based system that generates specific optimization recommendations based on detected issues\n   - Categorize recommendations by impact level (high/medium/low) and implementation difficulty\n   - Include code snippets or specific technical guidance where applicable\n\n4. Integration requirements:\n   - Ensure the module works with the bookmarklet core structure from Task #1\n   - Extend the performance analysis module from Task #7 with Core Web Vitals specific functionality\n   - Implement proper data collection that doesn't interfere with the metrics being measured\n\n5. Technical considerations:\n   - Use the Web Vitals JavaScript library or implement custom measurement following Google's methodologies\n   - Ensure accurate measurement in various browser environments\n   - Implement proper throttling simulation to test under various network conditions\n   - Consider using PerformanceObserver API for metric collection\n   - Handle single-page applications and dynamic content loading scenarios",
+      "testStrategy": "Testing for the Core Web Vitals analysis module will follow a multi-layered approach:\n\n1. Unit testing:\n   - Create unit tests for each metric calculation function using Jest or similar testing framework\n   - Verify correct measurement algorithms for LCP, FID, and CLS independently\n   - Test element identification logic with mock DOM structures\n   - Validate recommendation engine rules with predefined test cases\n\n2. Integration testing:\n   - Test integration with the bookmarklet core structure (Task #1)\n   - Verify proper extension of the performance analysis module (Task #7)\n   - Ensure data flow between components works as expected\n\n3. Controlled environment testing:\n   - Create a set of test pages with known Core Web Vitals issues\n   - Verify the module correctly identifies and measures these issues\n   - Compare results against Chrome DevTools Lighthouse and PageSpeed Insights\n\n4. Cross-browser testing:\n   - Test in Chrome, Firefox, Safari, and Edge\n   - Verify consistent measurements across browsers\n   - Address any browser-specific implementation differences\n\n5. Real-world testing:\n   - Test against a diverse set of production websites with varying performance characteristics\n   - Compare results against Google's official Core Web Vitals measurement tools\n   - Validate accuracy within 10% margin of error compared to official tools\n\n6. Performance impact testing:\n   - Ensure the measurement code itself doesn't significantly impact the metrics being measured\n   - Verify the module has minimal performance overhead\n\n7. Acceptance criteria:\n   - Module accurately measures LCP, FID, and CLS within 10% of Google's official tools\n   - Successfully identifies elements contributing to poor scores\n   - Provides actionable, specific recommendations for improvement\n   - Functions correctly across all major browsers\n   - Integrates seamlessly with existing bookmarklet infrastructure",
+      "status": "done",
+      "dependencies": [
+        1,
+        7
+      ],
+      "priority": "high",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Core Web Vitals Metrics Collection",
+          "description": "Develop the foundational metrics collection system for LCP, FID, and CLS using the Web Vitals library and PerformanceObserver API.",
+          "dependencies": [],
+          "details": "Integrate the web-vitals library or implement custom collection mechanisms following Google's methodologies. Use PerformanceObserver to track LCP elements, register event listeners for FID measurement, and implement layout shift calculation for CLS. Ensure the collection system works in various browsers and doesn't interfere with the metrics being measured. Include throttling simulation capabilities to test under various network conditions.",
+          "status": "done",
+          "testStrategy": "Test across multiple browsers and network conditions. Compare results against Chrome DevTools Lighthouse and PageSpeed Insights for validation."
+        },
+        {
+          "id": 2,
+          "title": "Develop Element Identification and Attribution System",
+          "description": "Create algorithms to identify and attribute specific DOM elements that contribute to poor Core Web Vitals scores.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement element tracking to identify the largest contentful paint element, elements causing layout shifts, and components contributing to input delay. Create DOM traversal utilities to map metrics to specific page elements. Develop a visual highlighting system using CSS overlays to pinpoint problematic elements directly on the analyzed page. Include element metadata collection (size, position, timing) for detailed analysis.",
+          "status": "done",
+          "testStrategy": "Test with various page layouts and dynamic content scenarios. Verify element attribution accuracy by comparing with Chrome DevTools Performance panel."
+        },
+        {
+          "id": 3,
+          "title": "Build Recommendation Engine for Core Web Vitals Optimization",
+          "description": "Develop a rule-based system that generates specific optimization recommendations based on detected Core Web Vitals issues.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Create a comprehensive rule set for common Core Web Vitals issues (e.g., unoptimized images for LCP, non-passive event listeners for FID, layout shifts from unspecified dimensions). Implement logic to categorize recommendations by impact level (high/medium/low) and implementation difficulty. Generate specific technical guidance including code snippets where applicable. Design the recommendation format to be actionable and clear.",
+          "status": "done",
+          "testStrategy": "Test against known problematic sites to verify recommendation accuracy. Have technical reviewers validate the quality and relevance of recommendations."
+        },
+        {
+          "id": 4,
+          "title": "Integrate with Bookmarklet Core and Performance Module",
+          "description": "Connect the Core Web Vitals analysis module with the existing bookmarklet core structure and extend the performance analysis module.",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "Implement the module interface according to the bookmarklet core structure from Task #1. Extend the performance analysis module from Task #7 with Core Web Vitals specific functionality. Create proper data flow between modules, ensuring the Core Web Vitals data is accessible to other components. Implement appropriate UI hooks for displaying results within the existing interface. Handle initialization and cleanup processes properly.",
+          "status": "done",
+          "testStrategy": "Test integration points with mock objects representing the bookmarklet core and performance module. Verify proper data flow and event handling between modules."
+        },
+        {
+          "id": 5,
+          "title": "Implement Special Case Handling and Final Optimization",
+          "description": "Add support for edge cases such as single-page applications, dynamic content loading, and implement final optimizations for the module.",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "details": "Enhance the module to properly handle single-page applications by monitoring navigation events and route changes. Implement detection and measurement for dynamically loaded content. Add support for monitoring Core Web Vitals after user interactions that trigger significant page changes. Optimize the module's own performance to minimize impact on the page being analyzed. Implement proper error handling and fallback mechanisms for unsupported browsers or edge cases.",
+          "status": "done",
+          "testStrategy": "Test with complex single-page applications and sites with heavy dynamic content loading. Measure the module's own performance impact and optimize as needed."
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "title": "Task #14: Structured Data Analysis Module Development",
+      "description": "Develop a module to detect, validate, and analyze Schema.org markup in JSON-LD, Microdata, and RDFa formats, providing comprehensive structured data analysis for SEO optimization.",
+      "details": "This task involves implementing a structured data analysis module as specified in section 1.5 of the PRD. The module should:\n\n1. Detect the presence of structured data in three formats:\n   - JSON-LD (script tags with application/ld+json type)\n   - Microdata (itemscope, itemtype attributes)\n   - RDFa (vocab, typeof attributes)\n\n2. Extract and parse structured data from the page HTML, building a normalized representation regardless of the original format.\n\n3. Validate structured data against Schema.org specifications:\n   - Verify required fields are present\n   - Check for proper nesting and relationships\n   - Validate data types and formats\n   - Detect missing recommended properties\n\n4. Implement specialized validators for common schema types:\n   - Breadcrumbs\n   - FAQs\n   - Product information\n   - Review markup\n   - Organization/LocalBusiness\n   - Article/NewsArticle\n\n5. Generate detailed reports including:\n   - Errors (missing required fields, invalid values)\n   - Warnings (missing recommended fields)\n   - Schema-specific recommendations for improvement\n   - Visualization of detected structured data\n\n6. Integrate with the existing SEO analysis module (Task #3) to provide a unified analysis report.\n\n7. Ensure the module works within the bookmarklet core structure (Task #1) for seamless page analysis.\n\nTechnical considerations:\n- Use a modular approach with separate parsers for each format\n- Implement a unified validation engine that works across formats\n- Consider performance optimization for large pages with extensive markup\n- Handle edge cases like multiple schema types on a single page\n- Support internationalization for error messages and recommendations",
+      "testStrategy": "Testing for the structured data analysis module should include:\n\n1. Unit Tests:\n   - Create test cases for each parser (JSON-LD, Microdata, RDFa) with valid and invalid examples\n   - Test validation logic for each supported schema type\n   - Verify error and warning detection with known problematic markup\n   - Test edge cases like nested schemas and multiple schema types\n\n2. Integration Tests:\n   - Verify integration with the SEO analysis module (Task #3)\n   - Test within the bookmarklet core structure (Task #1)\n   - Ensure proper data flow between components\n\n3. Real-world Testing:\n   - Create a test suite of 20+ real websites with various structured data implementations\n   - Include sites with multiple schema types and formats\n   - Include examples of both well-formed and problematic structured data\n   - Test with very large pages to ensure performance\n\n4. Validation Accuracy:\n   - Compare module results with Google's Structured Data Testing Tool and Rich Results Test\n   - Ensure all errors detected by Google's tools are also detected by our module\n   - Verify recommendations align with current SEO best practices\n\n5. User Acceptance Testing:\n   - Verify the module provides clear, actionable feedback\n   - Test the visualization component for clarity and usefulness\n   - Ensure recommendations are practical and implementable\n\n6. Performance Testing:\n   - Measure parsing and analysis time for various page sizes\n   - Ensure the module doesn't significantly impact overall bookmarklet performance\n   - Optimize if analysis takes more than 2 seconds on average pages\n\nDocumentation of test results should include screenshots of the module's output compared to Google's tools for the same pages.",
+      "status": "done",
+      "dependencies": [
+        1,
+        3
+      ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Structured Data Detection and Extraction",
+          "description": "Create parsers to detect and extract structured data in JSON-LD, Microdata, and RDFa formats from HTML pages.",
+          "dependencies": [],
+          "details": "Develop three separate parser modules (one for each format) that can identify and extract structured data from HTML. Each parser should: 1) Scan the DOM for format-specific markers, 2) Extract the raw structured data, 3) Convert the data into a normalized internal representation with consistent property naming and structure regardless of the original format. Include helper functions to detect which formats are present on a page. The normalized data structure should preserve the original format type for reference.",
+          "status": "done",
+          "testStrategy": "Create unit tests with sample HTML fragments containing each format. Test detection accuracy, extraction completeness, and normalization consistency. Include edge cases like malformed markup and mixed formats."
+        },
+        {
+          "id": 2,
+          "title": "Build Schema.org Validation Engine",
+          "description": "Develop a validation engine that checks extracted structured data against Schema.org specifications and identifies errors and warnings.",
+          "dependencies": [],
+          "details": "Create a validation module that: 1) Loads Schema.org type definitions (consider using a library or pre-processed schema definitions), 2) Validates normalized structured data against these definitions, 3) Checks for required properties, proper nesting, correct data types, and recommended properties, 4) Generates detailed validation results with error and warning messages. Implement a flexible validation rule system that can be extended for specific schema types.",
+          "status": "done",
+          "testStrategy": "Test with valid and invalid structured data examples for various schema types. Verify that all validation rules work correctly and appropriate error/warning messages are generated."
+        },
+        {
+          "id": 3,
+          "title": "Implement Specialized Schema Type Validators",
+          "description": "Create specialized validators for common schema types including Breadcrumbs, FAQs, Product, Review, Organization/LocalBusiness, and Article/NewsArticle.",
+          "dependencies": [],
+          "details": "Extend the base validation engine with specialized validators for each priority schema type. Each specialized validator should: 1) Implement type-specific validation rules beyond the basic Schema.org requirements, 2) Check for SEO best practices specific to that schema type, 3) Generate schema-specific recommendations for improvement. Create a registry system to map schema types to their specialized validators.",
+          "status": "done",
+          "testStrategy": "Create comprehensive test cases for each schema type, including examples from major websites. Verify that type-specific validation rules correctly identify issues and provide appropriate recommendations."
+        },
+        {
+          "id": 4,
+          "title": "Develop Structured Data Analysis Reporting",
+          "description": "Create a reporting module that generates detailed analysis reports from validation results, including errors, warnings, and recommendations.",
+          "dependencies": [],
+          "details": "Implement a reporting module that: 1) Processes validation results from both the base validator and specialized validators, 2) Organizes findings into categories (errors, warnings, recommendations), 3) Generates human-readable explanations for each issue, 4) Provides actionable recommendations for fixing problems, 5) Creates a visual representation of the structured data hierarchy. Include severity ratings and prioritized recommendations.",
+          "status": "done",
+          "testStrategy": "Test with various validation result sets to ensure reports are accurate, comprehensive, and provide actionable insights. Verify that the visualization correctly represents the structured data hierarchy."
+        },
+        {
+          "id": 5,
+          "title": "Integrate with SEO Analysis Module and Bookmarklet Core",
+          "description": "Integrate the structured data analysis module with the existing SEO analysis module and ensure compatibility with the bookmarklet core structure.",
+          "dependencies": [],
+          "details": "1) Create an integration layer between the structured data module and the SEO analysis module (Task #3), 2) Ensure structured data findings are incorporated into the unified SEO report, 3) Adapt the module to work within the bookmarklet core architecture (Task #1), 4) Implement performance optimizations for large pages with extensive markup, 5) Add configuration options for controlling analysis depth and report detail. Handle edge cases like multiple schema types on a single page and internationalization for messages.",
+          "status": "done",
+          "testStrategy": "Perform integration testing with the full bookmarklet application. Test performance with large, complex pages containing multiple schema types. Verify that structured data analysis results appear correctly in the unified SEO report."
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "title": "Task #15: Enhanced Security Analysis Module Development",
+      "description": "Expand the existing security analysis module to implement comprehensive security checks as specified in section 5 of the PRD, including content security policies, injection vulnerabilities, authentication security, sensitive information detection, and third-party script analysis.",
+      "details": "This task involves extending the basic security module (Task #8) to provide more advanced security analysis capabilities:\n\n1. Content Security Policy (CSP) Analysis:\n   - Implement detection and validation of CSP headers\n   - Identify missing directives and suggest improvements\n   - Check for unsafe CSP configurations\n\n2. Injection Vulnerability Detection:\n   - Analyze for XSS vulnerabilities in HTML, JavaScript, and CSS\n   - Check for SQL injection risks in form submissions\n   - Identify potential CSRF vulnerabilities\n\n3. Authentication and Session Security:\n   - Verify secure cookie attributes (HttpOnly, Secure, SameSite)\n   - Check for proper session management practices\n   - Identify insecure authentication mechanisms\n\n4. Sensitive Information Detection:\n   - Scan for exposed API keys, tokens, and credentials\n   - Identify unencrypted personal data\n   - Check for sensitive data in localStorage/sessionStorage\n\n5. Third-party Script Security Analysis:\n   - Evaluate the security posture of external scripts\n   - Check for outdated libraries with known vulnerabilities\n   - Analyze third-party code loading practices\n\nThe module should generate detailed security recommendations with severity ratings and remediation steps. It must integrate with the existing security module from Task #8 while maintaining backward compatibility. The implementation should leverage the bookmarklet core structure from Task #1 to access and analyze page content.\n\nTechnical considerations:\n- Use static code analysis techniques for vulnerability detection\n- Implement pattern matching for sensitive data identification\n- Create a modular architecture to allow for future security check additions\n- Ensure minimal performance impact on the main application",
+      "testStrategy": "The enhanced security analysis module should be thoroughly tested using the following approach:\n\n1. Unit Testing:\n   - Create unit tests for each security check component\n   - Verify correct detection of known security issues\n   - Test edge cases and boundary conditions\n   - Ensure proper integration with the core bookmarklet structure\n\n2. Integration Testing:\n   - Test integration with the existing security module (Task #8)\n   - Verify that all security checks work together without conflicts\n   - Ensure proper data flow between security analysis components\n\n3. Vulnerability Test Suite:\n   - Create a test suite with intentionally vulnerable web pages\n   - Include examples of each vulnerability type to be detected\n   - Verify that the module correctly identifies all vulnerabilities\n   - Test against OWASP Top 10 vulnerabilities\n\n4. Performance Testing:\n   - Measure execution time on various page sizes and complexities\n   - Ensure the enhanced module doesn't significantly impact page load times\n   - Optimize any performance bottlenecks\n\n5. Acceptance Testing:\n   - Verify that all requirements from PRD section 5 are implemented\n   - Ensure security recommendations are clear and actionable\n   - Test on various browsers and platforms for compatibility\n   - Validate that the security report format meets stakeholder requirements\n\n6. Security Testing:\n   - Perform a security review of the module itself\n   - Ensure the module doesn't introduce new security risks\n   - Verify secure handling of any sensitive data discovered\n\nSuccess criteria:\n- All test cases pass with at least 95% code coverage\n- Module correctly identifies at least 90% of intentional vulnerabilities\n- Performance impact is less than 500ms on standard test pages\n- Security recommendations match industry best practices",
+      "status": "done",
+      "dependencies": [
+        1,
+        8
+      ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Content Security Policy Analysis Module",
+          "description": "Create a module that analyzes Content Security Policy headers, identifies missing directives, and suggests improvements for better security posture.",
+          "dependencies": [],
+          "details": "Develop a CSP analyzer that: 1) Extracts and parses CSP headers from HTTP responses, 2) Evaluates the completeness of CSP directives against best practices, 3) Identifies unsafe inline scripts/styles that violate CSP, 4) Generates recommendations for improving CSP configuration with specific directive suggestions, and 5) Assigns severity ratings to identified issues. Use the existing security module from Task #8 as a foundation and ensure the new module follows the same interface pattern.",
+          "status": "done",
+          "testStrategy": "Test with various websites having different CSP configurations. Create mock responses with known CSP vulnerabilities and verify detection accuracy. Validate that recommendations follow OWASP best practices."
+        },
+        {
+          "id": 2,
+          "title": "Develop Injection Vulnerability Detection System",
+          "description": "Build a component that scans page content and scripts for potential XSS, SQL injection, and CSRF vulnerabilities.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement pattern recognition algorithms to identify: 1) Unsanitized user inputs in DOM elements, 2) Potential XSS vectors in JavaScript event handlers and inline scripts, 3) Form submissions without CSRF tokens, 4) Unparameterized SQL-like query strings, and 5) DOM-based XSS vulnerabilities. Create a scoring system for vulnerability severity based on impact and exploitability. The detection system should analyze both static HTML and dynamically generated content through DOM traversal.",
+          "status": "done",
+          "testStrategy": "Create test cases with known injection vulnerabilities. Validate detection against OWASP XSS and SQL injection cheat sheets. Test with both obvious and obfuscated vulnerability patterns."
+        },
+        {
+          "id": 3,
+          "title": "Create Authentication and Session Security Validator",
+          "description": "Develop functionality to analyze cookie attributes, session management practices, and authentication mechanisms for security weaknesses.",
+          "dependencies": [
+            2
+          ],
+          "details": "Build a validator that: 1) Examines all cookies for secure attributes (HttpOnly, Secure, SameSite), 2) Detects session identifiers transmitted insecurely, 3) Identifies weak authentication patterns like basic auth without TLS, 4) Checks for session timeout configurations, and 5) Analyzes password field implementations for security best practices. The validator should provide specific remediation steps for each identified issue, with code examples where applicable.",
+          "status": "done",
+          "testStrategy": "Test against sites with various authentication mechanisms. Verify detection of insecure cookies and session handling. Create test scenarios with common authentication vulnerabilities to validate detection accuracy."
+        },
+        {
+          "id": 4,
+          "title": "Implement Sensitive Information Detection Scanner",
+          "description": "Create a scanner that identifies exposed API keys, credentials, personal data, and other sensitive information in page source, scripts, and storage.",
+          "dependencies": [
+            3
+          ],
+          "details": "Develop a scanner that: 1) Uses regex patterns to detect common API key formats, tokens, and credentials in source code, 2) Identifies potential PII in localStorage/sessionStorage, 3) Detects unencrypted transmission of sensitive data, 4) Recognizes common patterns for credit card numbers, SSNs, and other sensitive data, and 5) Checks for secure storage practices. Implement context-aware detection to reduce false positives. The scanner should categorize findings by sensitivity level and provide secure handling recommendations.",
+          "status": "done",
+          "testStrategy": "Test with pages containing deliberate sensitive information patterns. Validate detection of various API key formats from major services. Verify low false-positive rate by testing against benign similar patterns."
+        },
+        {
+          "id": 5,
+          "title": "Build Third-party Script Security Analyzer",
+          "description": "Develop an analyzer that evaluates external scripts, checks for outdated libraries with known vulnerabilities, and assesses third-party code loading practices.",
+          "dependencies": [
+            4
+          ],
+          "details": "Create an analyzer that: 1) Identifies all third-party scripts loaded by the page, 2) Extracts version information where available, 3) Compares against a vulnerability database to flag known vulnerable versions, 4) Evaluates script loading practices (e.g., integrity attributes, subresource integrity), 5) Assesses the security implications of script permissions and access patterns. The analyzer should generate a risk report for each third-party component with specific upgrade recommendations and security enhancement suggestions.",
+          "status": "done",
+          "testStrategy": "Test against pages with multiple third-party scripts. Verify detection of known vulnerable library versions. Validate recommendations against current security best practices for script inclusion."
+        }
+      ]
+    }
+  ]
+}

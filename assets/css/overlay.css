@@ -1,0 +1,266 @@
+/**
+ * 한국어 웹사이트 분석기 오버레이 스타일시트
+ * 
+ * 오버레이 UI의 스타일을 정의합니다.
+ */
+
+/* 오버레이 컨테이너 */
+#korean-web-analyzer-overlay {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2147483647; /* 최대 z-index 값 */
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 380px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow: hidden;
+  font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Nanum Gothic', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333333;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#korean-web-analyzer-overlay.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 오버레이 헤더 */
+.kwa-overlay-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  background-color: #4285f4;
+  color: white;
+  border-radius: 8px 8px 0 0;
+}
+
+.kwa-overlay-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.kwa-overlay-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.kwa-overlay-close:hover {
+  opacity: 1;
+}
+
+/* 오버레이 콘텐츠 */
+.kwa-overlay-content {
+  padding: 0;
+  overflow-y: auto;
+  max-height: calc(80vh - 50px);
+}
+
+/* 오버레이 탭 */
+.kwa-tabs {
+  display: flex;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.kwa-tab {
+  padding: 10px 15px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.kwa-tab:hover {
+  background-color: rgba(66, 133, 244, 0.08);
+}
+
+.kwa-tab.active {
+  border-bottom-color: #4285f4;
+  font-weight: 600;
+  color: #4285f4;
+}
+
+/* 탭 콘텐츠 */
+.kwa-tab-content {
+  display: none;
+  padding: 15px;
+}
+
+.kwa-tab-content.active {
+  display: block;
+}
+
+/* 로딩 표시 */
+.kwa-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  text-align: center;
+}
+
+.kwa-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(66, 133, 244, 0.2);
+  border-top: 4px solid #4285f4;
+  border-radius: 50%;
+  animation: kwa-spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes kwa-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 요약 패널 */
+.kwa-summary {
+  padding: 15px;
+}
+
+.kwa-score-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.kwa-score-card {
+  flex: 1;
+  text-align: center;
+  background-color: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 0 5px;
+}
+
+.kwa-score-card:first-child {
+  margin-left: 0;
+}
+
+.kwa-score-card:last-child {
+  margin-right: 0;
+}
+
+.kwa-score-value {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.kwa-score-label {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+/* 문제점 목록 */
+.kwa-issues-list {
+  margin-top: 15px;
+}
+
+.kwa-issue-item {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border-left: 4px solid #e0e0e0;
+  background-color: #f8f9fa;
+}
+
+.kwa-issue-critical {
+  border-left-color: #dc3545;
+  background-color: #fff5f5;
+}
+
+.kwa-issue-warning {
+  border-left-color: #ffc107;
+  background-color: #fff9e6;
+}
+
+.kwa-issue-info {
+  border-left-color: #17a2b8;
+  background-color: #e6f9fd;
+}
+
+.kwa-issue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.kwa-issue-title {
+  font-weight: 600;
+  margin: 0;
+}
+
+.kwa-issue-severity {
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  text-transform: uppercase;
+}
+
+.kwa-severity-critical {
+  background-color: #dc3545;
+  color: white;
+}
+
+.kwa-severity-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.kwa-severity-info {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.kwa-issue-description {
+  margin-bottom: 10px;
+}
+
+.kwa-issue-solution {
+  font-size: 13px;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 8px;
+  border-radius: 4px;
+}
+
+/* 반응형 조정 */
+@media (max-width: 480px) {
+  #korean-web-analyzer-overlay {
+    width: 95vw;
+    right: 10px;
+    top: 10px;
+  }
+  
+  .kwa-tabs {
+    overflow-x: auto;
+  }
+  
+  .kwa-score-container {
+    flex-direction: column;
+  }
+  
+  .kwa-score-card {
+    margin: 0 0 10px 0;
+  }
+}

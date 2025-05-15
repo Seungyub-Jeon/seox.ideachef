@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="국제화 및 지역화 모듈 테스트 페이지">
+    <meta name="content-language" content="ko">
+    <meta property="og:locale" content="ko_KR">
+    <meta property="og:locale:alternate" content="en_US">
+    <link rel="alternate" hreflang="ko" href="https://example.com/ko/test-i18n.html">
+    <link rel="alternate" hreflang="en" href="https://example.com/en/test-i18n.html">
+    <link rel="alternate" hreflang="ja" href="https://example.com/ja/test-i18n.html">
+    <link rel="alternate" hreflang="x-default" href="https://example.com/test-i18n.html">
+    <title>국제화 및 지역화 모듈 테스트</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+        }
+        
+        section {
+            margin-bottom: 40px;
+        }
+        
+        .results {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .language-switcher {
+            padding: 10px;
+            background: #eee;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .language-switcher a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #3498db;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 15px;
+        }
+        
+        .test-button {
+            padding: 10px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        
+        .test-button:hover {
+            background: #2980b9;
+        }
+        
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .rtl-text {
+            direction: rtl;
+            text-align: right;
+            font-family: 'Scheherazade', 'Amiri', serif;
+            margin: 20px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>국제화 및 지역화 모듈 테스트</h1>
+        <div class="language-switcher">
+            <a href="#" data-lang="ko">한국어</a>
+            <a href="#" data-lang="en">English</a>
+            <a href="#" data-lang="ja">日本語</a>
+            <a href="#" data-lang="zh">中文</a>
+            <a href="#" data-lang="ar">العربية</a>
+        </div>
+    </header>
+    
+    <section id="overview">
+        <h2>모듈 개요</h2>
+        <p>이 페이지는 국제화 및 지역화 분석 모듈을 테스트하기 위한 페이지입니다. 이 모듈은 다음 기능을 제공합니다:</p>
+        <ul>
+            <li>언어 설정 감지 및 분석</li>
+            <li>문자 인코딩 분석</li>
+            <li>지역화 기능 감지 (날짜/시간 형식, 숫자 형식, 통화 등)</li>
+            <li>다국어 지원 평가</li>
+            <li>RTL 언어 지원 평가</li>
+        </ul>
+    </section>
+    
+    <section id="testing">
+        <h2>테스트 섹션</h2>
+        
+        <div class="test-section">
+            <h3>언어 설정 테스트</h3>
+            <p>현재 페이지 언어: <span lang="ko">한국어</span></p>
+            <p>Other languages: <span lang="en">English</span>, <span lang="ja">日本語</span>, <span lang="zh">中文</span></p>
+            <div class="rtl-text" lang="ar">هذا نص باللغة العربية (RTL اختبار اللغة)</div>
+            <button id="test-language" class="test-button">언어 감지 테스트</button>
+            <div id="language-results" class="results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>문자 인코딩 테스트</h3>
+            <p>이 페이지는 UTF-8 인코딩을 사용합니다.</p>
+            <p>다양한 언어의 문자가 올바르게 표시되는지 확인:</p>
+            <ul>
+                <li>English (Latin): Hello, World!</li>
+                <li>한국어 (Korean): 안녕하세요, 세계!</li>
+                <li>日本語 (Japanese): こんにちは、世界！</li>
+                <li>中文 (Chinese): 你好，世界！</li>
+                <li>Español (Spanish): ¡Hola, Mundo!</li>
+                <li>Русский (Russian): Привет, мир!</li>
+                <li>العربية (Arabic): مرحبا بالعالم!</li>
+            </ul>
+            <button id="test-encoding" class="test-button">인코딩 분석 테스트</button>
+            <div id="encoding-results" class="results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>지역화 기능 테스트</h3>
+            <p>다양한 지역화 요소 확인:</p>
+            
+            <h4>날짜 형식:</h4>
+            <ul>
+                <li>한국식: 2023년 9월 15일</li>
+                <li>ISO 8601: 2023-09-15</li>
+                <li>미국식: 09/15/2023</li>
+                <li>유럽식: 15/09/2023</li>
+                <li>독일식: 15.09.2023</li>
+            </ul>
+            
+            <h4>시간 형식:</h4>
+            <ul>
+                <li>24시간제: 14:30</li>
+                <li>12시간제: 2:30 PM</li>
+                <li>한국식: 14시 30분</li>
+            </ul>
+            
+            <h4>숫자 형식:</h4>
+            <ul>
+                <li>천단위 쉼표: 1,234,567.89</li>
+                <li>천단위 마침표: 1.234.567,89</li>
+                <li>천단위 공백: 1 234 567,89</li>
+            </ul>
+            
+            <h4>통화:</h4>
+            <ul>
+                <li>원화: ₩10,000</li>
+                <li>달러: $10.99</li>
+                <li>유로: 10.99€</li>
+                <li>엔화: ¥1,000</li>
+            </ul>
+            
+            <button id="test-localization" class="test-button">지역화 기능 테스트</button>
+            <div id="localization-results" class="results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>다국어 지원 테스트</h3>
+            <p>URL 구조, 번역 메커니즘, hreflang 태그 등 테스트</p>
+            
+            <!-- 번역 요소 테스트용 -->
+            <div data-i18n="test.greeting">안녕하세요</div>
+            <div data-translate="welcome">환영합니다</div>
+            
+            <button id="test-multilanguage" class="test-button">다국어 지원 테스트</button>
+            <div id="multilanguage-results" class="results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>통합 분석 테스트</h3>
+            <p>모든 국제화/지역화 컴포넌트의 통합 분석을 수행합니다.</p>
+            <button id="test-all" class="test-button">통합 분석 테스트</button>
+            <div id="all-results" class="results"></div>
+        </div>
+    </section>
+    
+    <!-- 스크립트 로드 -->
+    <script>
+        // 스크립트 로드 함수
+        function loadScript(moduleName, callback) {
+            const script = document.createElement('script');
+            script.src = `assets/js/${moduleName}.js?v=${new Date().getTime()}`;
+            script.async = true;
+            
+            script.onload = function() {
+                console.log(`${moduleName} 모듈이 로드되었습니다.`);
+                if (callback && typeof callback === 'function') {
+                    callback(null, moduleName);
+                }
+            };
+            
+            script.onerror = function() {
+                console.error(`${moduleName} 모듈 로드에 실패했습니다.`);
+                if (callback && typeof callback === 'function') {
+                    callback(new Error(`${moduleName} 모듈 로드 실패`), moduleName);
+                }
+            };
+            
+            document.head.appendChild(script);
+        }
+        
+        // 기본 네임스페이스 생성
+        window.KoreanWebAnalyzer = {
+            version: '0.1.0',
+            config: {
+                debug: true,
+                modules: {
+                    i18n: true
+                }
+            }
+        };
+        
+        // 모듈 로드 순서
+        function loadModules() {
+            loadScript('core', function(err) {
+                if (err) {
+                    console.error('코어 모듈 로드 실패:', err);
+                    return;
+                }
+                
+                loadScript('analyzer/i18n/language-detection', function(err) {
+                    if (err) console.warn('language-detection 모듈 로드 실패:', err);
+                    
+                    loadScript('analyzer/i18n/encoding-analyzer', function(err) {
+                        if (err) console.warn('encoding-analyzer 모듈 로드 실패:', err);
+                        
+                        loadScript('analyzer/i18n/localization-detector', function(err) {
+                            if (err) console.warn('localization-detector 모듈 로드 실패:', err);
+                            
+                            loadScript('analyzer/i18n/multilanguage-evaluator', function(err) {
+                                if (err) console.warn('multilanguage-evaluator 모듈 로드 실패:', err);
+                                
+                                loadScript('analyzer/i18n/index', function(err) {
+                                    if (err) console.warn('i18n 통합 모듈 로드 실패:', err);
+                                    
+                                    console.log('모든 모듈 로드 완료');
+                                    initializeTests();
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        }
+        
+        // 테스트 초기화
+        function initializeTests() {
+            // 언어 감지 테스트
+            document.getElementById('test-language').addEventListener('click', function() {
+                if (window.KoreanWebAnalyzer.analyzer.i18n.analyzeLanguage) {
+                    const results = window.KoreanWebAnalyzer.analyzer.i18n.analyzeLanguage();
+                    document.getElementById('language-results').innerHTML = '<pre>' + JSON.stringify(results, null, 2) + '</pre>';
+                } else {
+                    document.getElementById('language-results').textContent = '언어 감지 모듈을 찾을 수 없습니다.';
+                }
+            });
+            
+            // 인코딩 분석 테스트
+            document.getElementById('test-encoding').addEventListener('click', function() {
+                if (window.KoreanWebAnalyzer.analyzer.i18n.analyzeEncoding) {
+                    const results = window.KoreanWebAnalyzer.analyzer.i18n.analyzeEncoding();
+                    document.getElementById('encoding-results').innerHTML = '<pre>' + JSON.stringify(results, null, 2) + '</pre>';
+                } else {
+                    document.getElementById('encoding-results').textContent = '인코딩 분석 모듈을 찾을 수 없습니다.';
+                }
+            });
+            
+            // 지역화 기능 테스트
+            document.getElementById('test-localization').addEventListener('click', function() {
+                if (window.KoreanWebAnalyzer.analyzer.i18n.analyzeLocalization) {
+                    const results = window.KoreanWebAnalyzer.analyzer.i18n.analyzeLocalization();
+                    document.getElementById('localization-results').innerHTML = '<pre>' + JSON.stringify(results, null, 2) + '</pre>';
+                } else {
+                    document.getElementById('localization-results').textContent = '지역화 기능 모듈을 찾을 수 없습니다.';
+                }
+            });
+            
+            // 다국어 지원 테스트
+            document.getElementById('test-multilanguage').addEventListener('click', function() {
+                if (window.KoreanWebAnalyzer.analyzer.i18n.evaluateMultilanguageSupport) {
+                    const results = window.KoreanWebAnalyzer.analyzer.i18n.evaluateMultilanguageSupport();
+                    document.getElementById('multilanguage-results').innerHTML = '<pre>' + JSON.stringify(results, null, 2) + '</pre>';
+                } else {
+                    document.getElementById('multilanguage-results').textContent = '다국어 지원 모듈을 찾을 수 없습니다.';
+                }
+            });
+            
+            // 통합 분석 테스트
+            document.getElementById('test-all').addEventListener('click', function() {
+                if (window.KoreanWebAnalyzer.analyzer.i18n.analyze) {
+                    window.KoreanWebAnalyzer.analyzer.i18n.analyze()
+                        .then(results => {
+                            document.getElementById('all-results').innerHTML = '<pre>' + JSON.stringify(results, null, 2) + '</pre>';
+                        })
+                        .catch(err => {
+                            document.getElementById('all-results').textContent = '통합 분석 실패: ' + err.message;
+                        });
+                } else {
+                    document.getElementById('all-results').textContent = '통합 분석 모듈을 찾을 수 없습니다.';
+                }
+            });
+            
+            // 언어 전환 이벤트
+            const languageSwitchers = document.querySelectorAll('.language-switcher a');
+            languageSwitchers.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    alert(`언어 전환 요청: ${lang} (실제 구현은 이 데모에서 제외됨)`);
+                });
+            });
+        }
+        
+        // 페이지 로드 시 모듈 로드 시작
+        window.addEventListener('DOMContentLoaded', loadModules);
+    </script>
+</body>
+</html>
